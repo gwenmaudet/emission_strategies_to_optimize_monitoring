@@ -1,12 +1,19 @@
-import conf
 
+import conf
 from abstractions_of_sensors import sensor_view, information_system
 
+"""
+This is the M cycling function.
 
+
+strusture of 'end_of_devices'
+end_of_devices = [[related_sensor_name, fst_death_of_sensor_that_have_not_bee_replace_yet],[sensor_name, scd_death],...]
+
+"""
 def update_end_of_devices(new_death):
     global end_of_devices
-    index_to_delete = None
 
+    index_to_delete = None
     for i in range(len(end_of_devices)):
         if end_of_devices[i][0] == new_death[0]:
             if end_of_devices[i][1] == new_death[1] or end_of_devices[i][1] == None:
@@ -22,13 +29,21 @@ def update_end_of_devices(new_death):
             return
     end_of_devices.append(new_death)
 
+def  delete_element(sensor_name):
+    global end_of_devices
+    for i in range(len(end_of_devices)):
+        if end_of_devices[i][0] == sensor_name:
+            end_of_devices[i][1] = None
+            return
+    return
+
 
 def get_the_first_death_of_sensor():
     global end_of_devices
-    for elt in end_of_devices:
-        if elt[1] != None:
-            sensor_death = elt[1]
-            elt[1] = None
+    for i in range(len(end_of_devices)):
+        if end_of_devices[i][1]!= None:
+            sensor_death = end_of_devices[i][1]
+            end_of_devices[i][1] = None
             return sensor_death
 
 
@@ -49,9 +64,8 @@ def cycling_over_M(evt, simul_time, tau, M):
                     t_0 = simul_time
                     new_period = tau
                 else:
-                    new_period = tau - (
-                            simul_time - t_0) % tau + (
-                                         sensor_view_list.length() - 1) * tau
+                    new_period = (sensor_view_list.length()) * tau - (
+                            simul_time - t_0) % tau
             else:  # it would switch of just after the death of the next sensor, with a period of tau
                 beggining_of_this_sensor = get_the_first_death_of_sensor()
                 new_period = beggining_of_this_sensor - simul_time
@@ -61,12 +75,15 @@ def cycling_over_M(evt, simul_time, tau, M):
                 new_period = min(sensor_view_list.length(), M) * tau
                 if evt.battery < conf.c_e + conf.c_r:
                     sensor_view_list.remove(evt)
+                    delete_element(evt.name)
             else:
                 if evt.battery < conf.c_e:
                     sensor_view_list.remove(evt)
+                    delete_element(evt.name)
 
         # updating of end_of_device
         # sensor that have changed their period to M\tau or that didn't chang their period but will do at next emission : one change of period
+
         sensor_death = None
         if new_period == M * tau:
             sensor_death = simul_time + ((evt.battery - conf.c_r) // conf.c_e + 1) * tau * M

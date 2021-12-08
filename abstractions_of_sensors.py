@@ -1,5 +1,12 @@
 import conf
 
+"""
+Different abstraction of the sensors, according to which manage it:
+
+For the simulation, we use the class sensor
+The period update function can only have the information sensor_view, in order to store it in information_system
+"""
+
 
 def insert_event_in_event_list(elm, event):
     for i in range(len(event)):
@@ -11,9 +18,7 @@ def insert_event_in_event_list(elm, event):
     event.append(elm)
     return event
 
-"""
-sensor class for initialisation of sensors, and management of their comportment
-"""
+
 class sensor:
     def __init__(self, period=0, name="sensor",
                  battery=conf.C, fst_wake_up=0, event=[]):

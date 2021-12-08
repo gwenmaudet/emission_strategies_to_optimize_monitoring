@@ -1,6 +1,10 @@
 import math
 import statistics
 
+"""
+
+"""
+
 
 def get_freshness(emission_time_per_sensor, t, sensor_begginning_indexes_for_freshness):
     freshness = {}
