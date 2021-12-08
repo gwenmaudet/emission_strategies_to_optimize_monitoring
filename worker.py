@@ -62,10 +62,6 @@ def monitoring_of_sensor_emissions(management_function, tau, M, event, sensor_na
             changed_period[evt.name].append(simul_time)
         evt.expected_next_emission = simul_time + evt.period
         event = evt.sleep(simul_time, event)
-            # if bool is False:
-            #    sensor_view_list.remove(evt)
-        # else:
-        #    sensor_view_list.remove(evt)
     return simul_time, dt, emission_time_per_sensor, changed_period, t_0
 
 

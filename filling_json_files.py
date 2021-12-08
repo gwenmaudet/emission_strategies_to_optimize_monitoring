@@ -16,11 +16,11 @@ json_file = {M_1:{tau_1 : [Monitoring_time, Diversity, emissions_time_per_sensor
 
 def initialisation_of_json_file(M_list=[], tau_list=[]):
     json_initialised = {}
-    with open('json_storage.json', 'w+') as file:
+    with open('json_files/data_base_for_choice_of_f.json', 'w+') as file:
         json.dump(json_initialised, file)
 
 def store_in_json_format(monitoring_time, diversity, emission_time_per_sensor, M, tau):
-    with open(conf.json_dir, 'r') as file:
+    with open(conf.json_dir_for_db, 'r') as file:
         json_file = json.load(file) #The so called 'json_file' as the structure explained just above
     strM = str(round(M, 3))
     strtau = str(round(tau,3))
@@ -30,7 +30,7 @@ def store_in_json_format(monitoring_time, diversity, emission_time_per_sensor, M
         print("WARNING - ALLREADY A VALUE ENTERED for M: " + strM + "and tau:" + strtau)
     else:
         json_file[strM][strtau] = [monitoring_time, diversity, emission_time_per_sensor]
-    with open(conf.json_dir, 'w+') as file:
+    with open(conf.json_dir_for_db, 'w+') as file:
         json.dump(json_file, file)
 
 
@@ -50,6 +50,6 @@ if __name__ == '__main__':
     M_list = [i for i in range(1, conf.n, 10)]
     tau_list = [4.6 + 0.2 * i for i in range(21)]
     add_values_in_json_file(M_list, tau_list)
-    with open('json_storage.json', 'r') as file:
+    with open('json_files/data_base_for_choice_of_f.json', 'r') as file:
         json_file = json.load(file)
         print(json_file.keys())

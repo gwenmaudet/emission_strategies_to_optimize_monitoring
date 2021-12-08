@@ -66,6 +66,7 @@ def plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period,
     while time < maxi - t_0:
         time += tau
         plt.axvline(x=time, linestyle='--', linewidth=0.5)
+
     plt.title("representation of the sensor emission over time")
     plt.xlabel("time line")
     plt.ylabel("index of the sensor")

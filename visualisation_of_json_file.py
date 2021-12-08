@@ -18,7 +18,7 @@ This file allows to fill a json file for the performance of a function for given
 def plot_monitoring_function_of_diversity():
     diversities = []
     monitoring_times = []
-    with open(conf.json_dir, 'r') as file:
+    with open(conf.json_dir_for_db, 'r') as file:
         json_file = json.load(file)
         colors = cm.rainbow(np.linspace(0, 1, 12))
         i = 0
