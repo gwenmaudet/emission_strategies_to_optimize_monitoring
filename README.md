@@ -8,12 +8,16 @@ IMAGES IMT
 
 ## Start
 All the code is writen in Python. The packages used are :
-math, matplotlib, numpy, random, statistics
+
+    math, matplotlib, numpy, random, statistics
 
 ## Authors
 Mireille BATTON-HUBERT, EMSE
+
 Patrick MAILLE, INRIA, IRISA, Dyonisos
+
 Gwen MAUDET, IMT Atlantique, IRISA, OCIF
+
 Laurent TOUTAIN, IMT Atlantique, IRISA, OCIF
 
 
