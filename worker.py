@@ -1,6 +1,7 @@
+import logging
+
 import conf
 from abstractions_of_sensors import sensor, sensor_view
-
 
 """
 This file represents the envelope of the simulation.
@@ -16,7 +17,7 @@ def initialisation_of_sensors(activation_times, battery=conf.C):
     names = []
     for i in range(len(activation_times)):
         t_i = activation_times[i]
-        s = sensor(name="sensor number "+str(i), fst_wake_up=t_i, event=event, battery=battery)
+        s = sensor(name="sensor number " + str(i), fst_wake_up=t_i, event=event, battery=battery)
         names.append(s.name)
 
     return names, event
@@ -32,6 +33,7 @@ changed_period :  dictionary of sensors and their period change time  = {sensor_
                                                                                 ,sensor_name_1:[changing_time1,..]..}
 t_0 : initial emission
 """
+
 
 def monitoring_of_sensor_emissions(management_function, tau, M, event, sensor_names):
     # global sensor_view_list
@@ -52,6 +54,10 @@ def monitoring_of_sensor_emissions(management_function, tau, M, event, sensor_na
         else:
             delta_t = evt.wake_up - simul_time
             dt.append(delta_t)
+            if round(delta_t, 3) > round(tau, 3):
+                logging.info("the result from the function with parameters M="
+                             + M + " and tau=" + tau + " becausethe monitoring ends before all the sensors get included")
+                return False
         evt.draw()
         simul_time = evt.wake_up
         view = sensor_view(evt)
@@ -65,11 +71,5 @@ def monitoring_of_sensor_emissions(management_function, tau, M, event, sensor_na
     return simul_time, dt, emission_time_per_sensor, changed_period, t_0
 
 
-
-
-
-
-
 if __name__ == '__main__':
     A = 0
-
