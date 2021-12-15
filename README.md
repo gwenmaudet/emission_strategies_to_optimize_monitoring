@@ -12,8 +12,8 @@ All the code is writen in Python. The packages used are :
     math, matplotlib, numpy, random, statistics
     
 ## Functions, modules and their use
-### simulation_and_metrics
-The module named 'simulation_and_metrics" is a generic module to simulate emissions of sensors, according to an period update function (file "using_of_Cycle_M_and_vizualisation/M_cycling_function.py"), and provide the performance metrics.
+### simulation
+The module named 'simulation" is a generic module to simulate emissions of sensors, according to an period update function (here the function is the file "using_of_Cycle_M_and_vizualisation/M_cycling_function.py"), and provide the performance metrics.
 
 ### Parameters
 All the parameters fixed in the paper are represented in the file 
