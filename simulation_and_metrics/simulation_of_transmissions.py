@@ -35,7 +35,7 @@ t_0 : initial emission
 """
 
 
-def monitoring_of_sensor_emissions(management_function, tau, M, event, sensor_names):
+def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_names, M=None):
     # global sensor_view_list
     simul_time = 0
     dt = []

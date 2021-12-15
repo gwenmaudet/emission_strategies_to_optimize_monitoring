@@ -1,11 +1,9 @@
 import matplotlib.pyplot as plt
 import statistics
-import conf
 import random
 
-
-import simulation_of_transmissions
-import M_cycling_function
+from simulation_and_metrics import simulation_of_transmissions
+from using_of_Cycle_M_and_vizualisation import M_cycling_function
 
 """
 This file allows to see the behavior of the sensors in a graphical way (see explanatory figures in the paper). 
@@ -85,5 +83,6 @@ if __name__ == '__main__':
     for i in range(n):
         t_i.append(random.uniform(0, maxi))
     names, event = simulation_of_transmissions.initialisation_of_sensors(t_i, battery=C)
-    simul_time, dt, emission_time_per_sensor, changed_period, t_0 = simulation_of_transmissions.monitoring_of_sensor_emissions(M_cycling_function.cycling_over_M, tau, M, event, names)
+    simul_time, dt, emission_time_per_sensor, changed_period, t_0 = simulation_of_transmissions.monitoring_of_sensor_emissions(
+        M_cycling_function.cycling_over_M, tau, event, names, M)
     plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)

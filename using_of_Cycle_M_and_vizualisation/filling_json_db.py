@@ -1,13 +1,11 @@
 import json
-import math
 import logging
 
 logging.getLogger().setLevel(logging.INFO)
 
 import M_cycling_function
 import conf
-import simulation_of_transmissions
-import diversity
+from simulation_and_metrics import simulation_of_transmissions, diversity
 
 """
 This file allows to fill a json file for the performance of a function for given parameters. 
@@ -50,17 +48,15 @@ def add_values_in_json_db(M_list, tau_list, json_name):
                         round(tau, 3)))
                 sensor_names, event = simulation_of_transmissions.initialisation_of_sensors(conf.activation_times)
                 monitoring_info = simulation_of_transmissions.monitoring_of_sensor_emissions(
-                    M_cycling_function.cycling_over_M, tau, M, event, sensor_names)
+                    M_cycling_function.cycling_over_M, tau, event, sensor_names, M)
                 if monitoring_info is not False:
                     simul_time, dt, emission_time_per_sensor, changed_period, t_0 = monitoring_info
                     Q = diversity.compute_diversity_penalty(emission_time_per_sensor, t_0, simul_time, tau, conf.T)
                     store_one_new_value_in_json_db(simul_time - t_0, Q, M, tau, json_name)
 
 
-def fill_data_in_json_db(json_name):
-    # M_list = [i for i in range(1, conf.n, 10)]
+def fill_data_in_json_db(json_name,M_list, tau_list):
     M_list = [1, 2, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 125, 150, 200]
-    # M_list = [15, 20, 30, 40, 50, 75, 100, 125, 150, 200]
     tau_list = [0.1 + 0.1 * i for i in range(120)]
     add_values_in_json_db(M_list, tau_list, json_name)
 
@@ -69,7 +65,9 @@ if __name__ == '__main__':
     json_to_fill = conf.json_dir_for_db
 
     #initialisation_of_json_file(json_to_fill)
-    fill_data_in_json_db(json_to_fill)
+    M_list = [1, 2, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 125, 150, 200]
+    tau_list = [0.1 + 0.1 * i for i in range(120)]
+    fill_data_in_json_db(json_to_fill,M_list, tau_list)
     with open(json_to_fill, 'r') as file:
         json_file = json.load(file)
         logging.info("All the values of M in the DB are :")

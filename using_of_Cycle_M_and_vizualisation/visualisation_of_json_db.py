@@ -105,9 +105,10 @@ def weighted_sum_according_to_tau_for_different_values_of_M(Ms, cst):
 
 
 if __name__ == '__main__':
-    cplot_monitoring_function_of_diversity(conf.json_dir_for_db)
     Ms = [5,10,15,20,30,40,50,75,100,125,150,200]
     taus = [0.2, 0.4, 0.8, 1.4, 2.2, 3.2]
     cst = 300000
     #monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus)
+    plot_monitoring_function_of_diversity(conf.json_dir_for_db)
+
     #weighted_sum_according_to_tau_for_different_values_of_M(Ms, cst)
