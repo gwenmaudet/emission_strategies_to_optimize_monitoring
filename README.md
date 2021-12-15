@@ -3,7 +3,7 @@
 ## General information
 This project includes all the code used for the creation of the figures, as well as for the simulations of : "Emission Strategies to Optimize Monitoring". 
 
-IMAGES IMT
+![](https://github.com/gwenmaudet/emission_strategies_to_optimize_monitoring/blob/master/images/Logo_IMT_Atlantique.png)
 
 
 ## Start
