@@ -4,7 +4,7 @@ import conf
 import random
 
 
-import worker
+import simulation_of_transmissions
 import M_cycling_function
 
 """
@@ -84,6 +84,6 @@ if __name__ == '__main__':
     t_i = []
     for i in range(n):
         t_i.append(random.uniform(0, maxi))
-    names, event = worker.initialisation_of_sensors(t_i, battery=C)
-    simul_time, dt, emission_time_per_sensor, changed_period, t_0 = worker.monitoring_of_sensor_emissions(M_cycling_function.cycling_over_M, tau, M, event, names)
+    names, event = simulation_of_transmissions.initialisation_of_sensors(t_i, battery=C)
+    simul_time, dt, emission_time_per_sensor, changed_period, t_0 = simulation_of_transmissions.monitoring_of_sensor_emissions(M_cycling_function.cycling_over_M, tau, M, event, names)
     plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)

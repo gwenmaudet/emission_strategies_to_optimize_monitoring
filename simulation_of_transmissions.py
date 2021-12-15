@@ -56,7 +56,7 @@ def monitoring_of_sensor_emissions(management_function, tau, M, event, sensor_na
             dt.append(delta_t)
             if round(delta_t, 3) > round(tau, 3):
                 logging.info("the result from the function with parameters M="
-                             + M + " and tau=" + tau + " becausethe monitoring ends before all the sensors get included")
+                             + str(M) + " and tau=" + str(tau) + " because the monitoring ends before all the sensors get included")
                 return False
         evt.draw()
         simul_time = evt.wake_up

@@ -6,22 +6,21 @@ logging.getLogger().setLevel(logging.INFO)
 
 import M_cycling_function
 import conf
-import worker
+import simulation_of_transmissions
 import diversity
-import filling_json_files
+import filling_json_db
 
 
-def store_in_json_file(M_list, numerical_monitoring_times, numerical_diversities,
-                       analytical_monitoring_times, analytical_diversities, Q):
+def store_in_json_file(M, numerical_monitoring_time, numerical_diversitie, numerical_tau,
+                       analytical_monitoring_time, analytical_diversitie, analytical_tau, Q):
     with open(conf.json_dir_for_research_of_optimum, 'r') as file:
         json_file = json.load(file)
     if str(Q) not in json_file:
         json_file[str(Q)] = {}
-    for i in range (len(M_list)):
-        M = M_list[i]
-        dic = {"num_D":numerical_monitoring_times[i], "num_Q": numerical_diversities[i],
-               "ana_D": analytical_monitoring_times[i], "ana_Q": analytical_diversities[i]}
-        json_file[str(Q)][str(M)] = dic
+    dic = {"num_D": numerical_monitoring_time, "num_Q": numerical_diversitie, "num_tau": numerical_tau,
+           "ana_D": analytical_monitoring_time, "ana_Q": analytical_diversitie,
+           "ana_tau": analytical_tau}
+    json_file[str(Q)][str(M)] = dic
     with open(conf.json_dir_for_research_of_optimum, 'w+') as file:
         json.dump(json_file, file)
 
@@ -30,12 +29,12 @@ def finding_numericaly_the_fitting_tau_for_a_given_M_with_diver_Q(Q, M):
     tau_min = 0.2
     is_ok = False
     while is_ok is False:
-        sensor_names, event = worker.initialisation_of_sensors(conf.activation_times)
-        monitoring_info = worker.monitoring_of_sensor_emissions(
+        sensor_names, event = simulation_of_transmissions.initialisation_of_sensors(conf.activation_times)
+        monitoring_info = simulation_of_transmissions.monitoring_of_sensor_emissions(
             M_cycling_function.cycling_over_M, tau_min, M, event, sensor_names)
         if monitoring_info is not False:
             simul_time, dt, emission_time_per_sensor, changed_period, t_0 = monitoring_info
-            Q_max = diversity.compute_diversity(emission_time_per_sensor, t_0, simul_time, tau_min, conf.T)
+            Q_max = diversity.compute_diversity_penalty(emission_time_per_sensor, t_0, simul_time, tau_min, conf.T)
             D = simul_time - t_0
             if Q_max > Q:
                 is_ok = True
@@ -46,22 +45,22 @@ def finding_numericaly_the_fitting_tau_for_a_given_M_with_diver_Q(Q, M):
     tau_max = - conf.T * math.log(1 - 1 / Q)
     is_ok = False
     while is_ok is False:
-        sensor_names, event = worker.initialisation_of_sensors(conf.activation_times)
-        monitoring_info = worker.monitoring_of_sensor_emissions(
+        sensor_names, event = simulation_of_transmissions.initialisation_of_sensors(conf.activation_times)
+        monitoring_info = simulation_of_transmissions.monitoring_of_sensor_emissions(
             M_cycling_function.cycling_over_M, tau_max, M, event, sensor_names)
         simul_time, dt, emission_time_per_sensor, changed_period, t_0 = monitoring_info
-        Q_min = diversity.compute_diversity(emission_time_per_sensor, t_0, simul_time, tau_max, conf.T)
+        Q_min = diversity.compute_diversity_penalty(emission_time_per_sensor, t_0, simul_time, tau_max, conf.T)
         if Q_min < Q:
             is_ok = True
         else:
             tau_max += 0.1
     while tau_max - tau_min > conf.dif_tau:
         tau_inter = tau_min + (tau_max - tau_min) / 2
-        sensor_names, event = worker.initialisation_of_sensors(conf.activation_times)
-        monitoring_info = worker.monitoring_of_sensor_emissions(
+        sensor_names, event = simulation_of_transmissions.initialisation_of_sensors(conf.activation_times)
+        monitoring_info = simulation_of_transmissions.monitoring_of_sensor_emissions(
             M_cycling_function.cycling_over_M, tau_inter, M, event, sensor_names)
         simul_time, dt, emission_time_per_sensor, changed_period, t_0 = monitoring_info
-        Q_inter = diversity.compute_diversity(emission_time_per_sensor, t_0, simul_time, tau_inter, conf.T)
+        Q_inter = diversity.compute_diversity_penalty(emission_time_per_sensor, t_0, simul_time, tau_inter, conf.T)
         if Q_inter > Q:
             tau_min = tau_inter
             Q_max = Q_inter
@@ -69,7 +68,7 @@ def finding_numericaly_the_fitting_tau_for_a_given_M_with_diver_Q(Q, M):
         else:
             # Q_min = Q_inter
             tau_max = tau_inter
-    return Q_max, D
+    return Q_max, D, tau_min
 
 
 def analytical_function(M, tau):
@@ -91,37 +90,47 @@ def finding_analyticaly_the_fitting_tau_for_a_given_M_with_diver_Q(Q, M):
             tau_min = tau_inter
         else:
             tau_max = tau_inter
-    sensor_names, event = worker.initialisation_of_sensors(conf.activation_times)
-    monitoring_info = worker.monitoring_of_sensor_emissions(
+    sensor_names, event = simulation_of_transmissions.initialisation_of_sensors(conf.activation_times)
+    monitoring_info = simulation_of_transmissions.monitoring_of_sensor_emissions(
         M_cycling_function.cycling_over_M, tau_min, M, event, sensor_names)
     simul_time, dt, emission_time_per_sensor, changed_period, t_0 = monitoring_info
-    Q = diversity.compute_diversity(emission_time_per_sensor, t_0, simul_time, tau_min, conf.T)
-    return Q, simul_time - t_0
+    Q = diversity.compute_diversity_penalty(emission_time_per_sensor, t_0, simul_time, tau_min, conf.T)
+    return Q, simul_time - t_0, tau_min
 
 
 def storing_the_fitting_tau_and_M_for_a_fixed_Q(Q, M_list):
     # M_min = math.ceil(Q)
-    numerical_monitoring_times = []
-    numerical_diversities = []
-    analytical_monitoring_times = []
-    analytical_diversities = []
     for M in M_list:
         logging.info("time for the parameter M= " + str(M))
-        diver, monitoring_time = finding_numericaly_the_fitting_tau_for_a_given_M_with_diver_Q(Q, M)
-        numerical_monitoring_times.append(monitoring_time)
-        numerical_diversities.append(diver)
+        diver, monitoring_time,tau = finding_numericaly_the_fitting_tau_for_a_given_M_with_diver_Q(Q, M)
+        numerical_monitoring_time = monitoring_time
+        numerical_diversitie = diver
+        numerical_tau = tau
 
-        diver, monitoring_time = finding_analyticaly_the_fitting_tau_for_a_given_M_with_diver_Q(Q, M)
-        analytical_monitoring_times.append(monitoring_time)
-        analytical_diversities.append(diver)
-    store_in_json_file(M_list, numerical_monitoring_times, numerical_diversities,
-                       analytical_monitoring_times, analytical_diversities, Q)
+        diver, monitoring_time, tau = finding_analyticaly_the_fitting_tau_for_a_given_M_with_diver_Q(Q, M)
+        analytical_monitoring_time = monitoring_time
+        analytical_diversitie = diver
+        analytical_tau = tau
+        store_in_json_file(M, numerical_monitoring_time, numerical_diversitie, numerical_tau,
+                          analytical_monitoring_time, analytical_diversitie, analytical_tau, Q)
 
-def show_the_results_of_the_research_of_optimum():
+def print_the_results_of_the_research_of_optimum_for_latex(Q):
+    with open(conf.json_dir_for_research_of_optimum, 'r') as file:
+        json_file = json.load(file)
+
 
 
 
 if __name__ == '__main__':
-    storing_the_fitting_tau_and_M_for_a_fixed_Q(2.5, [10,20,30])
     #filling_json_files.initialisation_of_json_file(conf.json_dir_for_research_of_optimum)
+    storing_the_fitting_tau_and_M_for_a_fixed_Q(2.5, [10,50,100,150])
+    Q = 2.5
+    M = 100
+    a = - conf.T * math.log(1 - 1 / Q)
+    print(a)
+    b = 2.5173448669732355
+    print(analytical_function(M, a))
+    print(analytical_function(M, 0.2))
+    print(analytical_function(M, b))
+
 
