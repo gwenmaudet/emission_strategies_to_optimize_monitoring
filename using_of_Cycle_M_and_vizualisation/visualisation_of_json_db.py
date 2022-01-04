@@ -41,32 +41,35 @@ def plot_monitoring_function_of_diversity(json_name):
     plt.ylabel("Time of monitoring")
     plt.legend()
     #plt.yscale('log')
-    #plt.xscale('log')
+    plt.xscale('log')
     plt.show()
 
 
 def monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus):
     with open(conf.json_dir_for_db, 'r') as file:
         json_file = json.load(file)
-    print(json_file['1'].keys())
     M_values = {}
     monitoring_values = {}
     diversity_values = {}
+    nb_of_changes = {}
     for inttau in taus:
         M_values[inttau] = []
         monitoring_values[inttau] = []
         diversity_values[inttau] = []
+        nb_of_changes[inttau] = []
         strtau = str(round(float(inttau),3))
         for strM in json_file.keys():
             if strtau in json_file[strM].keys():
                 M_values[inttau].append(int(strM))
                 monitoring_values[inttau].append(json_file[strM][strtau][0])
                 diversity_values[inttau].append(json_file[strM][strtau][1])
+                nb_of_changes[inttau].append(json_file[strM][strtau][2])
     for inttau in taus:
         plt.plot(M_values[inttau], monitoring_values[inttau],label="monitoring time curve for parameter tau="+ str(inttau))
     plt.xlabel("Values of M")
     plt.ylabel("corresponding monitoring time")
     plt.title("monitoring time according to the choice of M for different values of tau")
+    #plt.yscale('log')
     plt.legend()
     plt.show()
     for inttau in taus:
@@ -74,6 +77,15 @@ def monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus):
     plt.xlabel("Values of M")
     plt.ylabel("corresponding diversity")
     plt.title("diversity penalty according to the choice of M for different values of tau")
+    plt.xscale('log')
+    plt.legend()
+    plt.show()
+    for inttau in taus:
+        plt.plot(M_values[inttau], nb_of_changes[inttau], label=" nb of usage of downlink transmission for parameter tau=" + str(inttau))
+    plt.xlabel("Values of M")
+    plt.ylabel("corresponding nb of emissions in downlink")
+    plt.title("nb of emissions in downlink according to the choice of M for different values of tau")
+    #plt.yscale('log')
     plt.legend()
     plt.show()
 
@@ -106,9 +118,10 @@ def weighted_sum_according_to_tau_for_different_values_of_M(Ms, cst):
 
 if __name__ == '__main__':
     Ms = [5,10,15,20,30,40,50,75,100,125,150,200]
-    taus = [0.2, 0.4, 0.8, 1.4, 2.2, 3.2]
+    #taus = [0.2, 0.4, 0.8, 1.4, 2.2, 3.2]
+    taus = [0.8,1.4,2.2,3.2,4.4,5.8,7.4]
     cst = 300000
-    #monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus)
+    monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus)
     plot_monitoring_function_of_diversity(conf.json_dir_for_db)
 
-    #weighted_sum_according_to_tau_for_different_values_of_M(Ms, cst)
+    weighted_sum_according_to_tau_for_different_values_of_M(Ms, cst)

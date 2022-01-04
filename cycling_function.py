@@ -1,7 +1,7 @@
 import conf
 import math
 
-from simulation_and_metrics.abstractions_of_sensors import information_system
+from simulation.abstractions_of_sensors import information_system
 
 # structure de l'enregistrement de division cycling : [[instants du prochain capteur qui a une période \tau
 def smart_insert(memory_stamp, name, next_emission, multiplicator, is_new=False):

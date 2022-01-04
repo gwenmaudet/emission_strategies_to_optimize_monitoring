@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import statistics
 import random
 
-from simulation_and_metrics import simulation_of_transmissions
+from simulation import simulation_of_transmissions
 from using_of_Cycle_M_and_vizualisation import M_cycling_function
 
 """

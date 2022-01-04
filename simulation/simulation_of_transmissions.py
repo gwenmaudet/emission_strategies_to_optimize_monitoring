@@ -1,7 +1,9 @@
 import logging
 
 import conf
-from abstractions_of_sensors import sensor, sensor_view
+from simulation.abstractions_of_sensors import sensor, sensor_view
+
+
 
 """
 This file represents the envelope of the simulation.
@@ -25,6 +27,8 @@ def initialisation_of_sensors(activation_times, battery=conf.C):
 
 """
 This file returns :
+Return False if a new sensor emmit after all the sensor are dead : means that the inter arrival is more than tau
+
 simul_time : the time instant of the last emission
 dt : the list of the time difference beween 2 consecutives emissions
 emission_time_per_sensor : dictionary of sensor name and their emision time = {sensor_name_1:[emission_time1,emission_time2],
@@ -36,7 +40,7 @@ t_0 : initial emission
 
 
 def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_names, M=None):
-    # global sensor_view_list
+    nb_of_changes = 0
     simul_time = 0
     dt = []
     emission_time_per_sensor = {}
@@ -61,14 +65,15 @@ def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_name
         evt.draw()
         simul_time = evt.wake_up
         view = sensor_view(evt)
-        new_period = management_function(view, simul_time, tau, M)  ######## use of the management function
+        new_period = management_function(view, simul_time, tau, M)  ######## use of the management function. return the value if it has changed, None otherwise
         emission_time_per_sensor[evt.name].append(simul_time)
         if new_period is not None and evt.battery >= conf.c_r:
             evt.set_period(new_period)
             changed_period[evt.name].append(simul_time)
+            nb_of_changes += 1
         evt.expected_next_emission = simul_time + evt.period
         event = evt.sleep(simul_time, event)
-    return simul_time, dt, emission_time_per_sensor, changed_period, t_0
+    return simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 
 import conf
-from simulation_and_metrics.abstractions_of_sensors import information_system
+from simulation.abstractions_of_sensors import information_system
 
 """
 This is the M cycling function.
