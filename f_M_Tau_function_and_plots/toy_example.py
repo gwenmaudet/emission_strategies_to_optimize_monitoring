@@ -3,7 +3,7 @@ import statistics
 import random
 
 from simulation import simulation_of_transmissions
-from using_of_Cycle_M_and_vizualisation import M_cycling_function
+from f_M_Tau_function_and_plots import f_M_tau
 
 """
 This file allows to see the behavior of the sensors in a graphical way (see explanatory figures in the paper). 
@@ -45,15 +45,15 @@ def plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period,
     not_yet = True
     i = 0
     for sensor_name in sensor_names_ordered_by_arrival_order:
-        plt.scatter([elt - t_0 for elt in emission_time_per_sensor[sensor_name]],
+        plt.scatter([(elt - t_0) for elt in emission_time_per_sensor[sensor_name]],
                     [i for j in range(len(emission_time_per_sensor[sensor_name]))], edgecolor='none')
         if not_yet is True:
-            plt.scatter([elt - t_0 for elt in changed_period[sensor_name]],
+            plt.scatter([(elt - t_0) for elt in changed_period[sensor_name]],
                         [i for j in range(len(changed_period[sensor_name]))], color='none',
                         edgecolor='black', linewidth=3, label="change of period instruction")
             not_yet = False
         else:
-            plt.scatter([elt - t_0 for elt in changed_period[sensor_name]],
+            plt.scatter([(elt - t_0) for elt in changed_period[sensor_name]],
                         [i for j in range(len(changed_period[sensor_name]))], color='none',
                         edgecolor='black', linewidth=3)
         i += 1
@@ -83,6 +83,7 @@ if __name__ == '__main__':
     for i in range(n):
         t_i.append(random.uniform(0, maxi))
     names, event = simulation_of_transmissions.initialisation_of_sensors(t_i, battery=C)
-    simul_time, dt, emission_time_per_sensor, changed_period, t_0 = simulation_of_transmissions.monitoring_of_sensor_emissions(
-        M_cycling_function.cycling_over_M, tau, event, names, M)
+    simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes = simulation_of_transmissions.monitoring_of_sensor_emissions(
+        f_M_tau.cycling_over_M, tau, event, names, M)
+
     plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)

@@ -4,7 +4,7 @@ import math
 
 logging.getLogger().setLevel(logging.INFO)
 
-import M_cycling_function
+import f_M_tau
 import conf
 from simulation import simulation_of_transmissions, diversity
 
@@ -49,7 +49,7 @@ def add_values_in_json_db(M_list, tau_list, json_name):
                         round(tau, 3)))
                 sensor_names, event = simulation_of_transmissions.initialisation_of_sensors(conf.activation_times)
                 monitoring_info = simulation_of_transmissions.monitoring_of_sensor_emissions(
-                    M_cycling_function.cycling_over_M, tau, event, sensor_names, M)
+                    f_M_tau.cycling_over_M, tau, event, sensor_names, M)
                 if monitoring_info is not False:
                     simul_time, dt, emission_time_per_sensor, changed_period, t_0,nb_of_changes = monitoring_info
                     Q = diversity.compute_diversity_penalty(emission_time_per_sensor, t_0, simul_time, tau, conf.T)
@@ -66,9 +66,9 @@ if __name__ == '__main__':
     #initialisation_of_json_file(json_to_fill)
     M_list = [1, 2, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 125, 150, 200]
     tau_list = [0.05 + 0.05 * i for i in range(250)]
-    #tau_list = [0.05 + 0.25 * i for i in range(50)]
+    #tau_list = [0.8, 1.4, 2.2, 3.2, 4.4, 5.8, 7.4]
+    #M_list = [i for i in range(1, 200, 2)]
     fill_data_in_json_db(json_to_fill,M_list, tau_list)
-
     with open(json_to_fill, 'r') as file:
         json_file = json.load(file)
         logging.info("All the values of M in the DB are :")

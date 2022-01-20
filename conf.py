@@ -16,8 +16,7 @@ T = 15 #spread factor of the utility function
 activation_times = [i * 15 *math.pi for i in range(n)]
 
 
-#json_dir_for_db = "json_files/data_base_for_choice_of_f.json"
-json_dir_for_db = "json_files/data_base_for_choice_of_f_V2.json"
+json_dir_for_db = "json_files/data_base_for_choice_of_f.json"
 
 
 """
