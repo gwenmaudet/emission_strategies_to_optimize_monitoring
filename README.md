@@ -44,11 +44,11 @@ By default, it will show the data base following the order of the figures shown 
 
 
 ## Authors
+Gwen MAUDET, IMT Atlantique, IRISA, OCIF
+
 Mireille BATTON-HUBERT, EMSE
 
-Patrick MAILLE, INRIA, IRISA, Dyonisos
-
-Gwen MAUDET, IMT Atlantique, IRISA, OCIF
+Patrick MAILLE, IMT Atlantique, IRISA, Dyonisos
 
 Laurent TOUTAIN, IMT Atlantique, IRISA, OCIF
 
