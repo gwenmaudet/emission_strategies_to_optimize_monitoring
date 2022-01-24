@@ -26,11 +26,11 @@ def smart_insert(memory_stamp, name, next_emission, multiplicator, is_new=False)
 
 
 #  {"name":, "next_emission":, "multiplicator":, "view":}
-def find_the_new_period_and_update(memory_stamp, evt, simul_time):
+def find_the_new_period_and_update(memory_stamp, evt, simul_time,tau):
     elt = memory_stamp[0]
     elt["multiplicator"] += 1
     memory_stamp = smart_insert(memory_stamp, elt["name"], elt["next_emission"], elt["multiplicator"])
-    new_period = elt["next_emission"] - simul_time + conf.tau * math.pow(2, elt["multiplicator"] - 1)
+    new_period = elt["next_emission"] - simul_time + tau * math.pow(2, elt["multiplicator"] - 1)
     memory_stamp = smart_insert(memory_stamp, evt.name, new_period + simul_time, elt["multiplicator"], is_new=True)
     return new_period, memory_stamp
 
@@ -40,7 +40,7 @@ def find_elt_in_memory_stamp(evt, memory_stamp):
         if elt["name"] == evt.name:
             return elt
 
-def update_the_death_in_memory_stamp(memory_stamp, simul_time, period, multiplicator):
+def update_the_death_in_memory_stamp(memory_stamp, simul_time, period, multiplicator, tau):
     i = 0
     next_emission_to_modify = simul_time + period / 2
     #is_found = False
@@ -58,10 +58,10 @@ def update_the_death_in_memory_stamp(memory_stamp, simul_time, period, multiplic
 
                     memory_stamp = update_the_death_in_memory_stamp(memory_stamp, elt["next_emission"],
                                                                     math.pow(2, elt["multiplicator"]),
-                                                                    elt["multiplicator"])
+                                                                    elt["multiplicator"], tau)
 
                     elt["multiplicator"] = multiplicator
-                    elt["new_imposed_period"] = math.pow(2, elt["multiplicator"]-1) * conf.tau
+                    elt["new_imposed_period"] = math.pow(2, elt["multiplicator"]-1) * tau
             i += 1
 
     else:
@@ -72,7 +72,7 @@ def update_the_death_in_memory_stamp(memory_stamp, simul_time, period, multiplic
 
 
 
-def division_cycling(evt, simul_time):
+def division_cycling(evt, simul_time, tau, M=0):
     global memory_stamp
     global sensor_view_list
     #global multiplimax
@@ -88,11 +88,11 @@ def division_cycling(evt, simul_time):
         #evt.give_view()
         if memory_stamp == []:
             sensor_view_list.update(evt)
-            memory_stamp.append({"name": evt.name, "next_emission": simul_time + conf.tau, "multiplicator": 0})
+            memory_stamp.append({"name": evt.name, "next_emission": simul_time + tau, "multiplicator": 0})
         else:
             if not sensor_view_list.is_in(evt):
                 sensor_view_list.update(evt)
-                new_period, memory_stamp = find_the_new_period_and_update(memory_stamp, evt, simul_time)
+                new_period, memory_stamp = find_the_new_period_and_update(memory_stamp, evt, simul_time, tau)
             else:
                 elt = find_elt_in_memory_stamp(evt, memory_stamp)
                 if "new_imposed_period" in elt.keys():
@@ -100,17 +100,17 @@ def division_cycling(evt, simul_time):
                     del elt["new_imposed_period"]
                     memory_stamp = smart_insert(memory_stamp, evt.name, new_period + simul_time, elt["multiplicator"])
 
-                elif evt.period != math.pow(2, elt["multiplicator"]) * conf.tau:
-                    new_period = math.pow(2, elt["multiplicator"]) * conf.tau
+                elif evt.period != math.pow(2, elt["multiplicator"]) * tau:
+                    new_period = math.pow(2, elt["multiplicator"]) * tau
                     memory_stamp = smart_insert(memory_stamp, evt.name, new_period + simul_time, elt["multiplicator"])
                 else:
                     memory_stamp = smart_insert(memory_stamp, evt.name, simul_time + evt.period, elt["multiplicator"])
     if new_period is not None and evt.battery < conf.c_e + conf.c_r:
         sensor_view_list.remove(evt)
-        memory_stamp = update_the_death_in_memory_stamp(memory_stamp, simul_time, new_period, elt["multiplicator"])
+        memory_stamp = update_the_death_in_memory_stamp(memory_stamp, simul_time, new_period, elt["multiplicator"], tau)
     if new_period is None and evt.battery < conf.c_e:
         sensor_view_list.remove(evt)
-        memory_stamp = update_the_death_in_memory_stamp(memory_stamp, simul_time, evt.period, elt["multiplicator"])
+        memory_stamp = update_the_death_in_memory_stamp(memory_stamp, simul_time, evt.period, elt["multiplicator"], tau)
     if new_period is not None and new_period<=0 :
         print(new_period)
     return new_period

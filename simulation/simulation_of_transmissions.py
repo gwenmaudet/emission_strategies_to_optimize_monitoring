@@ -39,7 +39,7 @@ t_0 : initial emission
 """
 
 
-def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_names, M=None):
+def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_names, M=None, known_battery=True):
     nb_of_changes = 0
     simul_time = 0
     dt = []
@@ -53,18 +53,32 @@ def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_name
     while len(event) != 0:
         evt = event.pop(0)
         assert (evt.wake_up >= simul_time)
-        if t_0 is None:
-            t_0 = simul_time
-        else:
+
+        if t_0 is not None:
             delta_t = evt.wake_up - simul_time
             dt.append(delta_t)
-            if round(delta_t, 3) > round(tau, 3):
+            """if round(delta_t, 3) > round(tau, 3):
                 logging.info("the result from the function with parameters M="
                              + str(M) + " and tau=" + str(tau) + " because the monitoring ends before all the sensors get included")
-                return False
+                #return False"""
         evt.draw()
         simul_time = evt.wake_up
-        view = sensor_view(evt)
+        if t_0 is None:
+            t_0 = simul_time
+        if known_battery is False:
+            if evt.battery >= conf.c_e + conf.c_r:
+                can_change_period = True
+                can_emit_again = True
+            elif evt.battery >= conf.c_e:
+                can_emit_again = True
+                can_change_period = False
+            else:
+                can_emit_again = False
+                can_change_period = False
+        else:
+            can_emit_again = None
+            can_change_period = None
+        view = sensor_view(evt, battery=known_battery, can_emit_again=can_emit_again, can_change_period=can_change_period)
         new_period = management_function(view, simul_time, tau, M)  ######## use of the management function. return the value if it has changed, None otherwise
         emission_time_per_sensor[evt.name].append(simul_time)
         if new_period is not None and evt.battery >= conf.c_r:

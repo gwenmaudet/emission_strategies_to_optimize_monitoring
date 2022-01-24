@@ -55,7 +55,7 @@ def plot_monitoring_function_of_diversity(json_name, Ms, cst):
 
 
 def monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus):
-    with open(conf.json_dir_for_db, 'r') as file:
+    with open(conf.json_dir_for_db_f_M_tau, 'r') as file:
         json_file = json.load(file)
     M_values = {}
     monitoring_values = {}
@@ -112,7 +112,7 @@ def monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus):
 
 
 def weighted_sum_according_to_tau_for_different_values_of_M(Ms, cst):
-    with open(conf.json_dir_for_db, 'r') as file:
+    with open(conf.json_dir_for_db_f_M_tau, 'r') as file:
         json_file = json.load(file)
     colors = cm.rainbow(np.linspace(0, 1, len(Ms)))
     j = 0
@@ -150,6 +150,6 @@ if __name__ == '__main__':
     taus = [0.8,1.4,2.2,3.2,4.4,5.8,7.4]
     cst = 1000000
     monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus)
-    plot_monitoring_function_of_diversity(conf.json_dir_for_db, Ms,cst)
+    plot_monitoring_function_of_diversity(conf.json_dir_for_db_f_M_tau, Ms, cst)
 
     weighted_sum_according_to_tau_for_different_values_of_M(Ms, cst)

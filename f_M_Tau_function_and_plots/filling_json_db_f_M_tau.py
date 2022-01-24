@@ -61,7 +61,7 @@ def fill_data_in_json_db(json_name,M_list, tau_list):
 
 
 if __name__ == '__main__':
-    json_to_fill = conf.json_dir_for_db
+    json_to_fill = conf.json_dir_for_db_f_M_tau
 
     #initialisation_of_json_file(json_to_fill)
     M_list = [1, 2, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 125, 150, 200]
