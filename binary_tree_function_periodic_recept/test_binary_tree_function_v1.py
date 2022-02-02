@@ -3,7 +3,7 @@ import statistics
 import random
 
 from simulation import simulation_of_transmissions
-from binary_tree_function import binary_tree_v1
+from binary_tree_function_periodic_recept import binary_tree_v1
 
 
 def plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau):
@@ -58,18 +58,19 @@ def plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period,
         time += tau
         plt.axvline(x=time, linestyle='--', linewidth=0.5)
 
-    plt.title("representation of the sensor emission over time")
-    plt.xlabel("time line")
-    plt.ylabel("index of the sensor")
+    plt.title("Representation of the sensor emission over time")
+    plt.xlabel("Time line")
+    plt.ylabel("Index of the sensor")
     plt.legend(loc='lower center')
+    plt.savefig("plots/toy_example_binary_tree_v1.pdf", dpi=80, figsize=(10, 6))
     plt.show()
 
 
 
 if __name__ == '__main__':
-    n = 200
-    C = 500
-    maxi = 1000
+    n = 5
+    C = 10
+    maxi = 20
     tau = 1
 
     t_i = []

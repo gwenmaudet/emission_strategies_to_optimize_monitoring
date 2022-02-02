@@ -2,9 +2,10 @@ import json
 import logging
 import math
 
+
 logging.getLogger().setLevel(logging.INFO)
 
-import binary_tree_v1
+import binary_tree_v2_without_any_conditions
 import conf
 from simulation import simulation_of_transmissions, diversity
 
@@ -46,10 +47,10 @@ def add_values_in_json_db(tau_list, json_name):
                     round(tau, 3)))
             sensor_names, event = simulation_of_transmissions.initialisation_of_sensors(conf.activation_times)
             monitoring_info = simulation_of_transmissions.monitoring_of_sensor_emissions(
-                binary_tree_v1.binary_tree, tau, event, sensor_names, known_battery=False)
+                binary_tree_v2_without_any_conditions.binary_tree, tau, event, sensor_names, known_battery=False)
             if monitoring_info is not False:
                 simul_time, dt, emission_time_per_sensor, changed_period, t_0,nb_of_changes = monitoring_info
-                Q = diversity.compute_diversity_penalty(emission_time_per_sensor, t_0, simul_time, tau, conf.T)
+                Q = diversity.compute_average_diversity_penalty(emission_time_per_sensor, t_0, simul_time, conf.T)
                 store_one_new_value_in_json_db(simul_time - t_0, Q,nb_of_changes, tau, json_name)
 
 
@@ -58,11 +59,11 @@ def fill_data_in_json_db(json_name,tau_list):
 
 
 if __name__ == '__main__':
-    json_to_fill = conf.json_dir_for_db_binary_tree_function
+    json_to_fill = conf.json_dir_for_db_binary_tree_v2_no_hypothesis
 
     #initialisation_of_json_file(json_to_fill)
-    #tau_list = [0.1 + 0.05 * i for i in range(250)]
-    tau_list = [0.1 + 0.2 * i for i in range(50)]
+    tau_list = [0.1 + 0.05 * i for i in range(250)]
+    #tau_list = [0.1 + 0.2 * i for i in range(50)]
     #tau_list = [0.8, 1.4, 2.2, 3.2, 4.4, 5.8, 7.4]
     #M_list = [i for i in range(1, 200, 2)]
     fill_data_in_json_db(json_to_fill, tau_list)

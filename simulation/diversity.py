@@ -6,50 +6,71 @@ import statistics
 """
 
 
-def get_freshness(emission_time_per_sensor, t, sensor_begginning_indexes_for_freshness):
-    freshness = {}
-
-    for sensor_name in emission_time_per_sensor:
-        i = sensor_begginning_indexes_for_freshness[sensor_name]
-        found = False
-        if i is None:
-            if round(emission_time_per_sensor[sensor_name][0],3) >= round(t,3):
-                found = True
-            else:
-                i = 0
-        while found is False:
-            i += 1
-            if len(emission_time_per_sensor[sensor_name]) == i:
-                found = True
-                sensor_begginning_indexes_for_freshness[sensor_name] = i - 1
-                freshness[sensor_name] = t - emission_time_per_sensor[sensor_name][i - 1]
-            elif round(emission_time_per_sensor[sensor_name][i],3) >= round(t,3):
-                found = True
-                sensor_begginning_indexes_for_freshness[sensor_name] = i - 1
-                freshness[sensor_name] = t - emission_time_per_sensor[sensor_name][i - 1]
-    return freshness, sensor_begginning_indexes_for_freshness
+def get_the_next_emission_and_sensor(simul_time, emission_time_per_sensor, stamp_indexes_for_freshness):
+    next_emission_instant = simul_time
+    next_emmitting_sensor = None
+    for sensor_name in emission_time_per_sensor.keys():
+        if stamp_indexes_for_freshness[sensor_name] == None:
+            if emission_time_per_sensor[sensor_name][0] < next_emission_instant:
+                next_emission_instant = emission_time_per_sensor[sensor_name][0]
+                next_emmitting_sensor = sensor_name
+        else:
+            if stamp_indexes_for_freshness[sensor_name] < len(emission_time_per_sensor[sensor_name]) - 1:
+                if emission_time_per_sensor[sensor_name][
+                    stamp_indexes_for_freshness[sensor_name] + 1] < next_emission_instant:
+                    next_emission_instant = emission_time_per_sensor[sensor_name][
+                        stamp_indexes_for_freshness[sensor_name] + 1]
+                    next_emmitting_sensor = sensor_name
+    return next_emission_instant, next_emmitting_sensor
 
 
-def compute_freshness_expo(freshness, T):
-    sum = 0
-    for sensor_names in freshness:
-        sum += math.exp(- freshness[sensor_names]/T)
+def update_stamps(stamp_indexes_for_freshness, next_emmitting_sensor):
+    if stamp_indexes_for_freshness[next_emmitting_sensor] == None:
+        stamp_indexes_for_freshness[next_emmitting_sensor] = 0
+    else:
+        stamp_indexes_for_freshness[next_emmitting_sensor] += 1
+    return stamp_indexes_for_freshness
 
-    return sum
+
+def compute_utility_between(emission_instant, t_minus_one, emission_time_per_sensor, stamp_indexes_for_freshness, T):
+    utility = 0
+    for sensor_name in emission_time_per_sensor.keys():
+        if stamp_indexes_for_freshness[sensor_name] is not None:
+            last_emission_time = emission_time_per_sensor[sensor_name][stamp_indexes_for_freshness[sensor_name]]
+            utility += T * (math.exp(-(t_minus_one - last_emission_time) / T) - math.exp(
+                -(emission_instant - last_emission_time) / T))
+    return utility
 
 
-
-def compute_diversity_penalty(emission_time_per_sensor, t_0, simul_time, tau, T):
-    utility = []
-    stamp_indexes_for_freshness = {}
+def compute_diversity_part_by_part(emission_time_per_sensor, t_0, simul_time, T):
+    utility = 0
+    stamp_indexes_for_freshness = {}  ### at time t, it is the indexes times of the last emission before t of the sensors
     for sensor_name in emission_time_per_sensor.keys():
         stamp_indexes_for_freshness[sensor_name] = None
+    t_minus_one = t_0
+    emission_instant, next_emmitting_sensor = get_the_next_emission_and_sensor(simul_time, emission_time_per_sensor,
+                                                                               stamp_indexes_for_freshness)
+    while emission_instant != simul_time:
+        adding_utility = compute_utility_between(emission_instant, t_minus_one, emission_time_per_sensor,
+                                           stamp_indexes_for_freshness, T)
+        utility += adding_utility
+        stamp_indexes_for_freshness = update_stamps(stamp_indexes_for_freshness, next_emmitting_sensor)
+        t_minus_one = emission_instant
+        emission_instant, next_emmitting_sensor = get_the_next_emission_and_sensor(simul_time, emission_time_per_sensor,
+                                                                                   stamp_indexes_for_freshness)
+    adding_utility = compute_utility_between(emission_instant, t_minus_one, emission_time_per_sensor,
+                                             stamp_indexes_for_freshness, T)
+    utility += adding_utility
+    utility = utility / (simul_time - t_0)
+    return 1 / utility
 
-    for k in range(0, int((simul_time - t_0) / tau)):
-        t = t_0 + k * tau
-        freshness, stamp_indexes_for_freshness = get_freshness(emission_time_per_sensor, t,
-                                                                           stamp_indexes_for_freshness)
-        ut = compute_freshness_expo(freshness, T)
-        utility.append(ut)
-    mean_utility = statistics.mean(utility)
-    return 1 / mean_utility
+
+def compute_average_diversity_penalty(emission_time_per_sensor, t_0, simul_time, T):
+    utility = 0
+    for sensor_name in emission_time_per_sensor:
+        emission_list = emission_time_per_sensor[sensor_name]
+        for i in range(1, len(emission_list)):
+            utility += T * (1 - math.exp(-(emission_list[i] - emission_list[i - 1]) / T))
+        utility += T * (1 - math.exp(-(simul_time - emission_list[len(emission_list) - 1]) / T))
+    utility = utility / (simul_time - t_0)
+    return 1 / utility
