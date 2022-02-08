@@ -60,6 +60,7 @@ def plot_monitoring_function_of_diversity( Ms, cst):
     plt.legend()
     #plt.yscale('log')
     plt.xscale('log')
+    plt.savefig("plots/comparison_V1_f_M_tau.pdf", dpi=80, figsize=(8, 6))
     plt.show()
 
 

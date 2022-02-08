@@ -34,71 +34,42 @@ json_file = {M_1:{tau_1 : [Monitoring_time, Diversity, emissions_time_per_sensor
 def f(x, a, b):
     return a * x + b
 
-"""
-def plot_monitoring_function_of_diversity(json_name, Ms, cst):
+def plot_monitoring_function_of_diversity(json_name, Ms, min_tau):
     total_diversities = []
     monitoring_times = []
     with open(json_name, 'r') as file:
         json_file = json.load(file)
     colors = cm.rainbow(np.linspace(0, 1, len(Ms)))
     i = 0
+    #forms = ['o' ,'s', '+','x', '*', 'D','d','H', 'h' ,'.' ,'>' ,'<' ,'v' ,'^','|' ,'_' ]
+    forms = ['o', 's', 'X',  'D', '>', '|', '_']
     for intM in Ms:
         M = str(intM)
         diversities = []
         monitoring_times = []
 
         for tau in json_file[M]:
-            diversities.append(json_file[M][tau][1])
-            monitoring_times.append(json_file[M][tau][0])
-        plt.scatter(diversities, monitoring_times, color=colors[i], label="M=" + str(M), s=0.5)
-        i += 1
-    plt.title("Performance of a function according to M and tau\n with some affine function plots")
-    plt.xlabel("Diversity penalty 'Q'")
-    plt.ylabel("Monitoring time 'L*tau'")
-    #plt.xscale('log')
-    x = np.linspace(0.022, 1.2, 100)
-    plt.plot(x, f(x, cst, -100000), label="affine with b=-1e^5")
-    plt.plot(x, f(x, cst, 0), label="affine with b=0")
-    plt.plot(x, f(x, cst, 100000), label="affine with b=1e^5")
-    # plt.yscale('log')
-    # plt.xscale('log')
-    plt.xlim(xmin=0.0022, xmax=1.05)
-    plt.ylim(ymin=-100000, ymax=2600000)
-    plt.legend(loc='upper left', ncol=2)
-    plt.savefig("plots/performance_and_pareto.pdf", dpi=80, figsize=(8, 6))
-
-    plt.show()
-"""
-def plot_monitoring_function_of_diversity(json_name, Ms, cst):
-    total_diversities = []
-    monitoring_times = []
-    with open(json_name, 'r') as file:
-        json_file = json.load(file)
-    colors = cm.rainbow(np.linspace(0, 1, len(Ms)))
-    i = 0
-    for intM in Ms:
-        M = str(intM)
-        diversities = []
-        monitoring_times = []
-
-        for tau in json_file[M]:
-            diversities.append(json_file[M][tau][1])
-            monitoring_times.append(json_file[M][tau][0])
-        plt.scatter(diversities, monitoring_times, color=colors[i], label="M=" + str(M), s=0.5)
+            if float(tau)>= min_tau:
+                diversities.append(1/json_file[M][tau][1])
+                monitoring_times.append(json_file[M][tau][0])
+        marker = forms.pop()
+        print(marker
+        )
+        plt.scatter(diversities, monitoring_times, color=colors[i], label="M=" + str(M), s=20, marker=marker,alpha=0.2)
         i += 1
     #plt.title("Performance of a function according to M and tau\n with some affine function plots")
-    plt.xlabel("Diversity penalty 'Q'")
+    plt.xlabel("Diversity 'D'")
     plt.ylabel("Monitoring time 'L*tau'")
-    plt.xscale('log')
+    #plt.xscale('log')
     x = np.linspace(0.022, 1.2, 100)
     #plt.plot(x, f(x, cst, -100000), label="affine with b=-1e^5")
     #plt.plot(x, f(x, cst, 0), label="affine with b=0")
     #plt.plot(x, f(x, cst, 100000), label="affine with b=1e^5")
     #plt.yscale('log')
     #plt.xscale('log')
-    plt.xlim(xmin=0.013, xmax=1.05)
+    #plt.xlim(xmax=1.05)
     plt.ylim(ymin=-10000, ymax=2600000)
-    plt.legend(loc='upper left', ncol=2)
+    plt.legend(loc='upper right', ncol=2)
     plt.savefig("plots/performance_and_pareto.pdf", dpi=80, figsize=(8, 6))
 
     plt.show()
@@ -124,7 +95,10 @@ def monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus):
                 monitoring_values[inttau].append(json_file[strM][strtau][0])
                 diversity_values[inttau].append(json_file[strM][strtau][1])
                 nb_of_changes[inttau].append(json_file[strM][strtau][2])
+    linestyles = ['-', '--', ':']
+    lineindex = 0
     for inttau in taus:
+
         logging.info("The max monitoring values for tau=" + str(inttau) + " is " + str(max(monitoring_values[inttau]))
                      + " and the min is " + str(min(monitoring_values[inttau]))
                      + " for a realative difference of " + str(
@@ -133,7 +107,8 @@ def monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus):
         results = list(zip(M_values[inttau], monitoring_values[inttau]))
         results.sort()
         plt.plot([results[i][0] for i in range(len(results))], [results[i][1] for i in range(len(results))],
-                 label="tau=" + str(inttau))
+                 label="tau=" + str(inttau), linestyle=linestyles[lineindex])
+        lineindex += 1
     plt.xlabel("Values of M")
     plt.ylabel("Monitoring time 'L*tau'")
     #plt.title("Monitoring time according to the choice of M for different values of tau")
@@ -141,24 +116,29 @@ def monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus):
     plt.legend()
     plt.savefig("plots/monitoring_according_to_M.pdf", dpi=80, figsize=(8, 6))
     plt.show()
+
+    lineindex = 0
     for inttau in taus:
         results = list(zip(M_values[inttau], diversity_values[inttau]))
         results.sort()
-        plt.plot([results[i][0] for i in range(len(results))], [results[i][1] for i in range(len(results))],
-                 label="tau=" + str(inttau))
+        plt.plot([results[i][0] for i in range(len(results))], [1/results[i][1] for i in range(len(results))],
+                 label="tau=" + str(inttau), linestyle=linestyles[lineindex])
+        lineindex += 1
     plt.xlabel("Values of M")
-    plt.ylabel("Diversity penalty 'Q'")
+    plt.ylabel("Diversity 'D'")
     #plt.title("Diversity penalty according to the choice of M for different values of tau")
-    plt.yscale('log')
+    #plt.yscale('log')
     plt.legend()
     plt.savefig("plots/diversity_according_to_M.pdf", dpi=80, figsize=(8, 6))
     plt.show()
 
+    lineindex = 0
     for inttau in taus:
         results = list(zip(M_values[inttau], nb_of_changes[inttau]))
         results.sort()
         plt.plot([results[i][0] for i in range(len(results))], [results[i][1] for i in range(len(results))],
-                 label="tau=" + str(inttau))
+                 label="tau=" + str(inttau), linestyle=linestyles[lineindex])
+        lineindex += 1
     plt.xlabel("Values of M")
     plt.ylabel("Number of emissions in downlink")
     #plt.title("Downlink emissions according to the choice of M for different values of tau")
@@ -202,11 +182,13 @@ def weighted_sum_according_to_tau_for_different_values_of_M(Ms, cst):
 
 if __name__ == '__main__':
     #Ms = [1,2,  3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 125, 150, 200]
-    Ms = [2,3,5,10,30,50,100,150,200]
-    # taus = [0.2, 0.4, 0.8, 1.4, 2.2, 3.2]
-    taus = [0.8, 1.4, 2.2, 3.2, 4.4, 5.8, 7.4]
+    Ms = [3,5,10,30,50,100,200]
+    Ms.reverse()
+    min_tau = 0.5
+    #taus = [0.8, 1.4, 2.2, 3.2, 4.4, 5.8, 7.4]
+    taus = [0.8, 3.2, 7.4]
     cst = 3000000
-    #monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus)
-    plot_monitoring_function_of_diversity(conf.json_dir_for_db_f_M_tau, Ms, cst)
+    monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus)
+    plot_monitoring_function_of_diversity(conf.json_dir_for_db_f_M_tau, Ms, min_tau)
 
     #weighted_sum_according_to_tau_for_different_values_of_M(Ms, cst)

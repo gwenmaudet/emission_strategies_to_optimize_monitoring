@@ -91,7 +91,3 @@ if __name__ == '__main__':
         f_M_tau.cycling_over_M, tau, event, names, M)
 
     plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)
-    """Diversity = diversity.compute_diversity_part_by_part(emission_time_per_sensor, t_0, simul_time, conf.T)
-    logging.info("diversity is equalt to =" + str(Diversity))
-    Diver = diversity.compute_average_diversity_penalty(emission_time_per_sensor, t_0, simul_time, conf.T)
-    logging.info(" or is equal to = " + str(Diver))"""

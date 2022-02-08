@@ -64,11 +64,11 @@ if __name__ == '__main__':
     json_to_fill = conf.json_dir_for_db_f_M_tau
 
     #initialisation_of_json_file(json_to_fill)
-    #M_list = [1, 2, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 125, 150, 200]
-    #tau_list = [0.1 + 0.05 * i for i in range(250)]
+    M_list = [1, 2, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 125, 150, 200]
+    tau_list = [0.5 + 0.05 * i for i in range(250)]
     #tau_list = [0.1 + 0.2 * i for i in range(50)]
-    tau_list = [0.8, 1.4, 2.2, 3.2, 4.4, 5.8, 7.4]
-    M_list = [i for i in range(1, 200, 2)]
+    #tau_list = [0.8, 1.4, 2.2, 3.2, 4.4, 5.8, 7.4]
+    #M_list = [i for i in range(1, 200, 2)]
     fill_data_in_json_db(json_to_fill,M_list, tau_list)
     with open(json_to_fill, 'r') as file:
         json_file = json.load(file)
