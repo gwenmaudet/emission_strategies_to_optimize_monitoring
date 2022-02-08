@@ -43,6 +43,9 @@ tau_list = [0.05 + 0.05 * i for i in range(250)]
 By default, it will show the data base following the order of the figures shown in the paper, from the part named "simulation".
 
 
+### binary_tree_function_periodic_recept & binary_tree_function_no_hypothesis
+These modules are used for further publications.
+
 ## Authors
 Gwen MAUDET, IMT Atlantique, IRISA, OCIF
 
