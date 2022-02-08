@@ -36,7 +36,7 @@ using_of_Cycle_M_and_vizualisation/filling_json_db.py
 By default, it initialise the json file (function "initialisation_of_json_file(json_to_fill)"), then fill it with the metrics of time of monitoring and diversity penalty for functions with parameters of M and tau : 
 ```
 M_list = [1, 2, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 125, 150, 200]
-tau_list = [0.05 + 0.05 * i for i in range(250)]
+tau_list = [0.5 + 0.05 * i for i in range(250)]
 ```
 
 #### Vizualisation of the data base 
