@@ -3,14 +3,14 @@ import math
 This file gathers the different parameters set for the simulations
 """
 
-n = 200
-C = 1000
+n = 300
+C = 500
 c_e = 1
 c_r = 1
 #tau = 1 # reception every 5 minutes
 
 
-T = 15 #spread factor of the utility function
+T = 20 #spread factor of the utility function
 #T = 20 #modified spred factor fo utility function
 
 activation_times = [i * 15 *math.pi for i in range(n)]
