@@ -14,12 +14,16 @@ Then, the simulation function of the sensors behavior, using the "event" object,
 """
 
 
-def initialisation_of_sensors(activation_times, battery=conf.C):
+def initialisation_of_sensors(activation_times, battery=conf.C, shut_down=None, battery_type = 0):
     event = []
     names = []
     for i in range(len(activation_times)):
         t_i = activation_times[i]
-        s = sensor(name="sensor number " + str(i), fst_wake_up=t_i, event=event, battery=battery)
+        if shut_down is None:
+            s = sensor(name="sensor number " + str(i), fst_wake_up=t_i, event=event, battery=battery, shut_down=10000000000000000000000000000, battery_type=battery_type)
+        else:
+            s = sensor(name="sensor number " + str(i), fst_wake_up=t_i, event=event, battery=battery,
+                       shut_down=shut_down[i], battery_type=battery_type)
         names.append(s.name)
 
     return names, event
@@ -53,40 +57,32 @@ def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_name
     while len(event) != 0:
         evt = event.pop(0)
         assert (evt.wake_up >= simul_time)
-
         if t_0 is not None:
-            delta_t = evt.wake_up - simul_time
-            dt.append(delta_t)
+
+            if evt.is_empty_value is False:
+                delta_t = evt.wake_up - simul_time
+                dt.append(delta_t)
+                simul_time = evt.wake_up
             """if round(delta_t, 3) > round(tau, 3):
                 logging.info("the result from the function with parameters M="
                              + str(M) + " and tau=" + str(tau) + " because the monitoring ends before all the sensors get included")
                 #return False"""
         evt.draw()
-        simul_time = evt.wake_up
+
         if t_0 is None:
+            simul_time = evt.wake_up
             t_0 = simul_time
-        if known_battery is False:
-            if evt.battery >= conf.c_e + conf.c_r:
-                can_change_period = True
-                can_emit_again = True
-            elif evt.battery >= conf.c_e:
-                can_emit_again = True
-                can_change_period = False
-            else:
-                can_emit_again = False
-                can_change_period = False
-        else:
-            can_emit_again = None
-            can_change_period = None
-        view = sensor_view(evt, battery=known_battery, can_emit_again=can_emit_again, can_change_period=can_change_period)
-        new_period = management_function(view, simul_time, tau, M)  ######## use of the management function. return the value if it has changed, None otherwise
-        emission_time_per_sensor[evt.name].append(simul_time)
-        if new_period is not None and evt.battery >= conf.c_r:
-            evt.set_period(new_period)
-            changed_period[evt.name].append(simul_time)
-            nb_of_changes += 1
-        evt.expected_next_emission = simul_time + evt.period
-        event = evt.sleep(simul_time, event)
+        view = sensor_view(evt, battery=known_battery)
+        new_period = management_function(view, evt.wake_up, tau, M, known_battery=known_battery)  ######## use of the management function. return the value if it has changed, None otherwise
+        if evt.is_empty_value is False:
+            emission_time_per_sensor[evt.name].append(evt.wake_up)
+            if new_period is not None and new_period != evt.period:
+                evt.set_period(new_period)
+                changed_period[evt.name].append(evt.wake_up)
+                nb_of_changes += 1
+            evt.expected_next_emission = evt.wake_up + evt.period
+        event = evt.sleep(evt.wake_up, event)
+
     return simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes
 
 

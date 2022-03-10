@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 import statistics
 import random
+import os
+import math
 
 from simulation import simulation_of_transmissions
 from binary_tree_function_periodic_recept import binary_tree_v1
-
+import conf
 
 def plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau):
     plt.scatter([i for i in range(len(dt))], dt, label="inter-arrival over time")
@@ -68,15 +70,22 @@ def plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period,
 
 
 if __name__ == '__main__':
-    n = 5
-    C = 10
+    n = 10
+    C = 5
     maxi = 20
     tau = 1
-
     t_i = []
+    t_s = []
+    t = 0
     for i in range(n):
-        t_i.append(random.uniform(0, maxi))
-    names, event = simulation_of_transmissions.initialisation_of_sensors(t_i, battery=C)
+        p = random.uniform(0, 1)
+        t -= math.log(p)/conf.lambda_activation
+        t_i.append(t)
+        p = random.uniform(0, 1)
+        new_time = t - math.log(p)/conf.lambda_shut_down
+        t_s.append(new_time)
+    names, event = simulation_of_transmissions.initialisation_of_sensors(t_i, battery=C, battery_type=2, shut_down=t_s)
     simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes = simulation_of_transmissions.monitoring_of_sensor_emissions(
         binary_tree_v1.binary_tree, tau, event, names, known_battery=False)
+    print(emission_time_per_sensor)
     plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)

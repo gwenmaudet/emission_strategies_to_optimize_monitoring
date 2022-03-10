@@ -48,16 +48,19 @@ def plot_monitoring_function_of_diversity(json_name, Ms, min_tau):
 
         for tau in json_file[M]:
             if float(tau)>= min_tau:
-                diversities.append(1/json_file[M][tau][1])
+                diversities.append(json_file[M][tau][1])
                 monitoring_times.append(json_file[M][tau][0])
         marker = forms.pop()
-        plt.scatter(diversities, monitoring_times, color=colors[i], label="M=" + str(M), s=20, marker=marker,alpha=0.3)
+        plt.scatter(diversities, monitoring_times, color=colors[i], label="M=" + str(M), s=20, marker=marker,alpha=0.5)
         i += 1
     #plt.title("Performance of a function according to M and tau\n with some affine function plots")
-    plt.xlabel("Diversity 'D'")
-    plt.ylabel("Monitoring time 'L*tau'")
+
+    plt.xlabel("Diversity, D")
+    plt.ylabel("Monitoring duration, L*tau")
     #plt.ylim(ymin=-10000, ymax=2600000)
+
     plt.legend(loc='upper right', ncol=2)
+    #plt.yscale('log')
     plt.savefig("plots/performance_and_pareto.pdf", dpi=80, figsize=(8, 6))
 
     plt.show()
@@ -83,7 +86,7 @@ def monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus):
                 monitoring_values[inttau].append(json_file[strM][strtau][0])
                 diversity_values[inttau].append(json_file[strM][strtau][1])
                 nb_of_changes[inttau].append(json_file[strM][strtau][2])
-    linestyles = ['-', '--', ':']
+    linestyles = ['-.', '--', ':']
     lineindex = 0
     for inttau in taus:
 
@@ -97,9 +100,18 @@ def monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus):
         plt.plot([results[i][0] for i in range(len(results))], [results[i][1]/inttau for i in range(len(results))],
                  label="tau=" + str(inttau), linestyle=linestyles[lineindex])
         lineindex += 1
+
+    x_coordinates = [i for i in range (1,conf.n)]
+    y_coordinates_lower_bound = [ (conf.n * conf.C - conf.n*conf.c_e - (2*conf.n-1 + i*(i-1))*conf.c_r)/conf.c_e for i in x_coordinates]
+    plt.plot(x_coordinates, y_coordinates_lower_bound, label="bounds", color="black")
+    y_coordinates_upper_bound = [(conf.n * conf.C - conf.n*conf.c_e - (2*conf.n-1) * conf.c_r)/conf.c_e]
+    for i in range (2, conf.n):
+        y_coordinates_upper_bound .append((conf.n * conf.C - conf.n*conf.c_e - (2*conf.n)*conf.c_r)/conf.c_e)
+    plt.plot(x_coordinates,y_coordinates_upper_bound, color="black")
     plt.xlabel("Values of M")
-    plt.ylabel("Sample span 'L'")
+    plt.ylabel("Sample span, L")
     plt.legend()
+    plt.ylim(ymin=80000)
     plt.savefig("plots/monitoring_according_to_M.pdf", dpi=80, figsize=(8, 6))
     plt.show()
 
@@ -107,11 +119,11 @@ def monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus):
     for inttau in taus:
         results = list(zip(M_values[inttau], diversity_values[inttau]))
         results.sort()
-        plt.plot([results[i][0] for i in range(len(results))], [1/results[i][1] for i in range(len(results))],
+        plt.plot([results[i][0] for i in range(len(results))], [results[i][1] for i in range(len(results))],
                  label="tau=" + str(inttau), linestyle=linestyles[lineindex])
         lineindex += 1
     plt.xlabel("Values of M")
-    plt.ylabel("Diversity 'D'")
+    plt.ylabel("Diversity, D")
     plt.legend()
     plt.savefig("plots/diversity_according_to_M.pdf", dpi=80, figsize=(8, 6))
     plt.show()
@@ -138,6 +150,17 @@ if __name__ == '__main__':
     #taus = [0.8, 1.4, 2.2, 3.2, 4.4, 5.8, 7.4]
     taus = [0.8, 3.2, 7.4]
     cst = 3000000
-    monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus)
+    #monitoring_and_diversity_according_to_M_for_a_fixed_taus(taus)
     plot_monitoring_function_of_diversity(conf.json_dir_for_db_f_M_tau, Ms, min_tau)
+    with open(conf.json_dir_stamp, 'r') as file:
+        json_file = json.load(file)
+    max_monitoring = 0
+    infos = ""
+    for strM in json_file.keys():
+        for strtau in json_file[strM].keys():
+            if json_file[strM][strtau][1]>10 and json_file[strM][strtau][0]>max_monitoring:
+                max_monitoring = json_file[strM][strtau][0]
+                infos = "M = to "+ strM + " tau  = to " + strtau + " for diver" + str(json_file[strM][strtau][1]) + " and monitoring = to " + str(json_file[strM][strtau][0])
+    print(infos)
+
 

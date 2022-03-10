@@ -50,7 +50,7 @@ def add_values_in_json_db(tau_list, json_name):
                 binary_tree_v2_without_any_conditions.binary_tree, tau, event, sensor_names, known_battery=False)
             if monitoring_info is not False:
                 simul_time, dt, emission_time_per_sensor, changed_period, t_0,nb_of_changes = monitoring_info
-                Q = diversity.compute_average_diversity_penalty(emission_time_per_sensor, t_0, simul_time, conf.T)
+                Q = diversity.compute_average_diversity(emission_time_per_sensor, t_0, simul_time, conf.T)
                 store_one_new_value_in_json_db(simul_time - t_0, Q,nb_of_changes, tau, json_name)
 
 

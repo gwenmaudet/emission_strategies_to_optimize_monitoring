@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import statistics
 import random
 import logging
+import math
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -78,16 +79,36 @@ def plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period,
 
 
 if __name__ == '__main__':
-    n = int(input("Enter the number of sensors :"))
+    """n = int(input("Enter the number of sensors :"))
     C = float(input("REMEMBER consumption of 1 emission=consumption of 1 reception = 1\n enter the capacity of each sensor :"))
     maxi = float(input("enter the size of the sensor activation time interval.\n The sensors will be activated randomly between 0 and this limit :"))
     M = int(input("enter the parameter M :"))
-    tau = float(input("enter the parameter tau :"))
+    tau = float(input("enter the parameter tau :"))"""
+    n = 10
+    C = 20
+    maxi = 30
+    M =3
+    tau = 1
     t_i = []
     for i in range(n):
         t_i.append(random.uniform(0, maxi))
     names, event = simulation_of_transmissions.initialisation_of_sensors(t_i, battery=C)
     simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes = simulation_of_transmissions.monitoring_of_sensor_emissions(
-        f_M_tau.cycling_over_M, tau, event, names, M)
+        f_M_tau.cycling_over_M, tau, event, names, M=M)
 
+    #plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)
+
+    t_i = []
+    t_s = []
+    t = 0
+    for i in range(n):
+        p = random.uniform(0, 1)
+        t -= math.log(p) / conf.lambda_activation
+        t_i.append(t)
+        p = random.uniform(0, 1)
+        new_time = t - math.log(p) / conf.lambda_shut_down
+        t_s.append(new_time)
+    names, event = simulation_of_transmissions.initialisation_of_sensors(t_i, battery=C, battery_type=2, shut_down=t_s)
+    simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes = simulation_of_transmissions.monitoring_of_sensor_emissions(
+        f_M_tau.cycling_over_M, tau, event, names, M=None, known_battery=False)
     plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)

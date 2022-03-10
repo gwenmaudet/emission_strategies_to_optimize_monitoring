@@ -89,7 +89,7 @@ def add_new_sensor(evt, simul_time, tau, children,parent):
 
 
 
-def binary_tree(evt, simul_time, tau, M=0):
+def binary_tree(evt, simul_time, tau, M=0, known_battery = False):
     global children
     global parent
     global sensor_view_list
@@ -108,6 +108,7 @@ def binary_tree(evt, simul_time, tau, M=0):
         if children ==[] and parent == []:
             sensor_view_list.update(evt, knowledge_on_battery=False)
             parent.append({"name": evt.name, "next_emission": simul_time + tau, "id_tree": ""})
+            new_period = tau
         else:
             if not sensor_view_list.is_in(evt):
                 sensor_view_list.update(evt, knowledge_on_battery=False)
@@ -127,18 +128,18 @@ def binary_tree(evt, simul_time, tau, M=0):
                     new_period = elt_in_memory["later_emission"] - simul_time
                     elt_in_memory.pop("later_emission", None)
                     elt_in_memory["next_emission"] = simul_time + new_period
-
-                if (evt.can_emit_again and evt.can_change_period) or (evt.can_emit_again and new_period is None):
-                    if type == "parent":
-                        parent.append(elt_in_memory)
-                    else:
-                        children.append(elt_in_memory)
-                    return new_period
-                if evt.can_emit_again is False or (evt.can_emit_again and evt.can_change_period is False and new_period is not None):
+                if evt.is_empty_value:
                     if len(children) == 0:
                         children = parent
                         parent = []
                         type = "children"
                     children,parent = remove_evt_from_active_sensors(elt_in_memory, type, simul_time, tau, children,parent)
                     sensor_view_list.remove(evt)
+                    return 0
+                if type == "parent":
+                    parent.append(elt_in_memory)
+                else:
+                    children.append(elt_in_memory)
+                return new_period
+
         return new_period

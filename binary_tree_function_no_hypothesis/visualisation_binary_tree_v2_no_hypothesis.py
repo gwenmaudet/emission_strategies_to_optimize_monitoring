@@ -48,7 +48,7 @@ def plot_monitoring_function_of_diversity( Ms, cst):
     for tau in json_file:
         diversities.append(json_file[tau][1])
         monitoring_times.append(json_file[tau][0])
-    plt.scatter(diversities, monitoring_times, color='black', edgecolor='black', label="binary tree function with periodic recept", s=5)
+    plt.scatter(diversities, monitoring_times, color='black', edgecolor='black', label="binary tree function with periodic recept", s=5, alpha=0.5)
 
     binary_tree_function_db_name = conf.json_dir_for_db_binary_tree_v2_no_hypothesis
     with open(binary_tree_function_db_name, 'r') as file:
@@ -58,7 +58,7 @@ def plot_monitoring_function_of_diversity( Ms, cst):
     for tau in json_file:
         diversities.append(json_file[tau][1])
         monitoring_times.append(json_file[tau][0])
-    plt.scatter(diversities, monitoring_times, color='red', edgecolor='red', label="binary tree function with no periodic receptions", s=5)
+    plt.scatter(diversities, monitoring_times, color='red', edgecolor='red', label="binary tree function with no periodic receptions", s=5, alpha=0.5)
     plt.title("performance of a function according to M and tau")
     plt.xlabel("Diversity penalty 'Q'")
     plt.ylabel("Monitoring time 'L*tau'")
@@ -76,7 +76,7 @@ def plot_monitoring_function_of_diversity( Ms, cst):
 
 
 if __name__ == '__main__':
-    Ms = [1,3,5,10,15,20,30,40,50,75,100,125,150,200]
+    Ms = [3, 5, 10, 15, 20, 30, 50, 100,150, 200]
     #taus = [0.2, 0.4, 0.8, 1.4, 2.2, 3.2]
     taus = [0.8,1.4,2.2,3.2,4.4,5.8,7.4]
     cst = 1000000
