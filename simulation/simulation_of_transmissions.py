@@ -43,22 +43,24 @@ t_0 : initial emission
 """
 
 
-def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_names, M=None, known_battery=True):
+def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_names, M=None, known_battery=True, stopping_time = 100000000000000000000000000000000000000000):
     nb_of_changes = 0
     simul_time = 0
     dt = []
     emission_time_per_sensor = {}
     changed_period = {}
-    t_0 = None
+    t_0 = 0
     for name in sensor_names:
         emission_time_per_sensor[name] = []
         changed_period[name] = []
     management_function(None, 0, tau, M)
-    while len(event) != 0:
+    while len(event) != 0 and (simul_time - t_0) < stopping_time:
         evt = event.pop(0)
         assert (evt.wake_up >= simul_time)
-        if t_0 is not None:
-
+        if t_0 == 0:
+            simul_time = evt.wake_up
+            t_0 = simul_time
+        else:
             if evt.is_empty_value is False:
                 delta_t = evt.wake_up - simul_time
                 dt.append(delta_t)
@@ -69,9 +71,7 @@ def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_name
                 #return False"""
         evt.draw()
 
-        if t_0 is None:
-            simul_time = evt.wake_up
-            t_0 = simul_time
+
         view = sensor_view(evt, battery=known_battery)
         new_period = management_function(view, evt.wake_up, tau, M, known_battery=known_battery)  ######## use of the management function. return the value if it has changed, None otherwise
         if evt.is_empty_value is False:

@@ -2,7 +2,7 @@ import random
 import matplotlib.pyplot as plt
 
 import conf
-from simulation import simulation_of_transmissions, diversity
+from simulation import simulation_of_transmissions, diversity_and_nb_of_active_sensors
 from binary_tree_function_periodic_recept import binary_tree_v1
 import binary_tree_v2_without_any_conditions
 
@@ -12,8 +12,8 @@ if __name__ == '__main__':
     names, event = simulation_of_transmissions.initialisation_of_sensors(conf.activation_times)
     simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes = simulation_of_transmissions.monitoring_of_sensor_emissions(
         binary_tree_v1.binary_tree, tau, event, names, known_battery=False)
-    utilities = diversity.compute_diversity_thanks_to_sample_step(emission_time_per_sensor, t_0, simul_time, conf.T,
-                                                                  conf.sample_step_for_diversity)
+    utilities = diversity_and_nb_of_active_sensors.compute_diversity_thanks_to_sample_step(emission_time_per_sensor, t_0, simul_time, conf.T,
+                                                                                           conf.sample_step_for_diversity)
     utilities.sort()
     x = []
     y = []
@@ -29,8 +29,8 @@ if __name__ == '__main__':
     names, event = simulation_of_transmissions.initialisation_of_sensors(conf.activation_times)
     simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes = simulation_of_transmissions.monitoring_of_sensor_emissions(
         binary_tree_v2_without_any_conditions.binary_tree, tau, event, names, known_battery=False)
-    utilities = diversity.compute_diversity_thanks_to_sample_step(emission_time_per_sensor, t_0, simul_time, conf.T,
-                                                                  conf.sample_step_for_diversity)
+    utilities = diversity_and_nb_of_active_sensors.compute_diversity_thanks_to_sample_step(emission_time_per_sensor, t_0, simul_time, conf.T,
+                                                                                           conf.sample_step_for_diversity)
     utilities.sort()
     x = []
     y = []

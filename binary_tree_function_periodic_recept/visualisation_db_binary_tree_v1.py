@@ -3,6 +3,7 @@ import matplotlib.cm as cm
 import json
 import numpy as np
 import statistics
+import math
 import logging
 import os
 
@@ -64,9 +65,68 @@ def plot_monitoring_function_of_diversity( Ms, cst):
     plt.show()
 
 
+def write_latex_sensor_variation_proba():
+    open("latex_files/sensor_variation_proba.tex", "w").close()
+
+    with open(conf.json_dir_binary_nb_of_sensors, 'r') as file:
+        json_file = json.load(file)
+    taus = [float(elt) for elt in json_file.keys()]
+    taus = sorted(taus)
+
+    #theoritical results
+    theoritical_result = []
+    nb_max_of_iteration = 300
+    for tau in taus:
+        pi = 0
+        pdt = 1
+        pdts = []
+        for i in range(1, nb_max_of_iteration):
+            pdt = pdt * (conf.lambda_activation/(i*conf.lambda_shut_down + conf.lambda_battery/float(tau)))
+            pdts.append(pdt)
+            pi += pdt
+        pi = 1/(1 + pi)
+        average_num = 0
+        for i in range (1,nb_max_of_iteration):
+            average_num += pi * pdts[i-1] * i
+        theoritical_result.append(average_num)
+    with open('latex_files/sensor_variation_proba.tex', 'a') as fout:
+        fout.write("\\addplot+[smooth,mark=*, only marks] plot coordinates {")
+        for i in range(len(theoritical_result)):
+            fout.write("(" + str(taus[i]) + "," + str(theoritical_result[i]) + ')')
+        fout.write("};\n")
+
+    #exponential results
+    with open('latex_files/sensor_variation_proba.tex', 'a') as fout:
+        fout.write("\\addplot+[smooth,mark=*, only marks,error bars/.cd, y dir=both, y explicit,] plot coordinates {")
+    for tau in taus:
+        strtau = str(tau)
+        list = json_file[strtau]["battery_exponential"]
+        stdev = statistics.stdev(list)
+        confidence_interval = stdev * 2.262 / math.sqrt(len(list))
+        mean = statistics.mean(list)
+        with open('latex_files/sensor_variation_proba.tex', 'a') as fout:
+            fout.write("(" + str(tau) + ',' + str(mean) + ') +- (0, '+ str(confidence_interval) + ')')
+    # dicrete consumption
+    with open('latex_files/sensor_variation_proba.tex', 'a') as fout:
+        fout.write("};\n\\addplot+[smooth,mark=*, only marks,error bars/.cd, y dir=both, y explicit,] plot coordinates {")
+    for tau in taus:
+        strtau = str(tau)
+        list = json_file[strtau]["discrete_consumption"]
+        stdev = statistics.stdev(list)
+        confidence_interval = stdev * 2.262 / math.sqrt(len(list))
+        mean = statistics.mean(list)
+        with open('latex_files/sensor_variation_proba.tex', 'a') as fout:
+            fout.write("(" + str(tau) + ',' + str(mean) + ') +- (0, ' + str(confidence_interval) + ')')
+    with open('latex_files/sensor_variation_proba.tex', 'a') as fout:
+        fout.write("};")
+
+
+
+
 if __name__ == '__main__':
-    Ms = [3, 5, 10, 15, 20, 30, 50, 100,150, 200]
+    """Ms = [3, 5, 10, 15, 20, 30, 50, 100,150, 200]
     #taus = [0.2, 0.4, 0.8, 1.4, 2.2, 3.2]
     taus = [0.8,1.4,2.2,3.2,4.4,5.8,7.4]
     cst = 1000000
-    plot_monitoring_function_of_diversity(Ms, cst)
+    plot_monitoring_function_of_diversity(Ms, cst)"""
+    write_latex_sensor_variation_proba()

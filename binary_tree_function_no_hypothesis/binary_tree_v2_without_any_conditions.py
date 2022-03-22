@@ -93,7 +93,7 @@ def add_new_sensor(evt, simul_time, tau, children, parent):
     return new_period, children, parent
 
 
-def binary_tree(evt, simul_time, tau, M=0):
+def binary_tree(evt, simul_time, tau, M=0, known_battery = False):
     global children
 
     global parent
@@ -129,15 +129,7 @@ def binary_tree(evt, simul_time, tau, M=0):
                 else:
                     new_period = tau * math.pow(2, len(elt_in_memory["id_tree"]))
                     elt_in_memory["next_emission"] = simul_time + new_period
-
-                if (evt.can_emit_again and evt.can_change_period) or (evt.can_emit_again and new_period is None):
-                    if type == "parent":
-                        parent.append(elt_in_memory)
-                    else:
-                        children.append(elt_in_memory)
-                    return new_period
-                if evt.can_emit_again is False or (
-                        evt.can_emit_again and evt.can_change_period is False and new_period is not None):
+                if evt.is_empty_value:
                     if len(children) == 0:
                         children = parent
                         parent = []
@@ -145,4 +137,9 @@ def binary_tree(evt, simul_time, tau, M=0):
                     children, parent = remove_evt_from_active_sensors(elt_in_memory, type, simul_time, tau, children,
                                                                       parent)
                     sensor_view_list.remove(evt)
+                else:
+                    if type == "parent":
+                        parent.append(elt_in_memory)
+                    else:
+                        children.append(elt_in_memory)
         return new_period

@@ -1,3 +1,5 @@
+import conf
+
 import math
 import statistics
 
@@ -33,12 +35,20 @@ def compute_diversity_thanks_to_sample_step(emission_time_per_sensor, t_0, simul
 
 
     emission_instant = t_0
+    sensor_set = list(emission_time_per_sensor.keys())
     while emission_instant < simul_time:
         stamp_indexes_for_freshness = update_stamp_indexes(emission_instant, emission_time_per_sensor, stamp_indexes_for_freshness)
         utility = 0
-        for sensor_name in emission_time_per_sensor.keys():
+        elt_to_remove = []
+        for sensor_name in sensor_set:
             if stamp_indexes_for_freshness[sensor_name] is not None:
-                utility += math.exp(-(emission_instant - emission_time_per_sensor[sensor_name][stamp_indexes_for_freshness[sensor_name]])/T)
+                delta_t = emission_instant - emission_time_per_sensor[sensor_name][stamp_indexes_for_freshness[sensor_name]]
+                utility += math.exp(-(delta_t)/T)
+            if emission_instant - emission_time_per_sensor[sensor_name][
+                len(emission_time_per_sensor[sensor_name]) - 1] > conf.threshold_delta_t:
+                    elt_to_remove.append(sensor_name)
+        for elt in elt_to_remove:
+            sensor_set.remove(elt)
         utilities.append(utility)
         emission_instant += sample_step
     return utilities
@@ -48,8 +58,19 @@ def compute_average_diversity(emission_time_per_sensor, t_0, simul_time, T):
     utility = 0
     for sensor_name in emission_time_per_sensor:
         emission_list = emission_time_per_sensor[sensor_name]
-        for i in range(1, len(emission_list)):
-            utility += T * (1 - math.exp(-(emission_list[i] - emission_list[i - 1]) / T))
-        utility += T * (1 - math.exp(-(simul_time - emission_list[len(emission_list) - 1]) / T))
+        if len(emission_list) != 0:
+            for i in range(1, len(emission_list)):
+                utility += T * (1 - math.exp(-(emission_list[i] - emission_list[i - 1]) / T))
+            utility += T * (1 - math.exp(-(simul_time - emission_list[len(emission_list) - 1]) / T))
     utility = utility / (simul_time - t_0)
     return utility
+
+
+def average_number_of_active_sensors(emission_time_per_sensor, t_0, simul_time):
+    average_number = 0
+    tot_time = simul_time - t_0
+    for sensor_name in emission_time_per_sensor:
+        average_number += (emission_time_per_sensor[sensor_name][len(emission_time_per_sensor[sensor_name]) - 1] - emission_time_per_sensor[sensor_name][0])/tot_time
+    return average_number
+
+

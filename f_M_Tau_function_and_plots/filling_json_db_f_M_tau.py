@@ -6,7 +6,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 import f_M_tau
 import conf
-from simulation import simulation_of_transmissions, diversity
+from simulation import simulation_of_transmissions, diversity_and_nb_of_active_sensors
 
 """
 This file allows to fill a json file for the performance of a function for given parameters. 
@@ -52,7 +52,7 @@ def add_values_in_json_db(M_list, tau_list, json_name):
                     f_M_tau.cycling_over_M, tau, event, sensor_names, M)
                 if monitoring_info is not False:
                     simul_time, dt, emission_time_per_sensor, changed_period, t_0,nb_of_changes = monitoring_info
-                    Q = diversity.compute_average_diversity(emission_time_per_sensor, t_0, simul_time, conf.T)
+                    Q = diversity_and_nb_of_active_sensors.compute_average_diversity(emission_time_per_sensor, t_0, simul_time, conf.T)
                     store_one_new_value_in_json_db(simul_time - t_0, Q,nb_of_changes, M, tau, json_name)
 
 
