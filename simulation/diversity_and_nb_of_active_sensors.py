@@ -8,9 +8,9 @@ import statistics
 """
 
 
-def update_stamp_indexes(next_emission_instant, emission_time_per_sensor, stamp_indexes_for_freshness):
+def update_stamp_indexes(next_emission_instant, emission_time_per_sensor, stamp_indexes_for_freshness, sensor_set):
     next_emission_instant
-    for sensor_name in emission_time_per_sensor.keys():
+    for sensor_name in sensor_set:
         if stamp_indexes_for_freshness[sensor_name] == None:
             if emission_time_per_sensor[sensor_name][0] < next_emission_instant:
                 stamp_indexes_for_freshness[sensor_name] = 0
@@ -25,19 +25,18 @@ def update_stamp_indexes(next_emission_instant, emission_time_per_sensor, stamp_
 
 
 
-def compute_diversity_thanks_to_sample_step(emission_time_per_sensor, t_0, simul_time, T, sample_step):
+def compute_diversity_thanks_to_sample_step(emission_time_per_sensor, simul_time,beggining_time = conf.beggining_time, T=conf.T, sample_step=conf.sample_step):
     utilities = []
-    stamp_indexes_for_freshness = {}  ### at time t, it is the indexes times of the last emission before t of the sensors
-    for sensor_name in emission_time_per_sensor.keys():
-        stamp_indexes_for_freshness[sensor_name] = None
-    t_minus_one = t_0
-
-
-
-    emission_instant = t_0
+    emission_instant = beggining_time
     sensor_set = list(emission_time_per_sensor.keys())
+    for sensor_name in emission_time_per_sensor.keys():
+        if len(emission_time_per_sensor[sensor_name])== 0:
+            sensor_set.remove(sensor_name)
+    stamp_indexes_for_freshness = {}  ### at time t, it is the indexes times of the last emission before t of the sensors
+    for sensor_name in sensor_set:
+        stamp_indexes_for_freshness[sensor_name] = None
     while emission_instant < simul_time:
-        stamp_indexes_for_freshness = update_stamp_indexes(emission_instant, emission_time_per_sensor, stamp_indexes_for_freshness)
+        stamp_indexes_for_freshness = update_stamp_indexes(emission_instant, emission_time_per_sensor, stamp_indexes_for_freshness, sensor_set)
         utility = 0
         elt_to_remove = []
         for sensor_name in sensor_set:
@@ -68,9 +67,10 @@ def compute_average_diversity(emission_time_per_sensor, t_0, simul_time, T):
 
 def average_number_of_active_sensors(emission_time_per_sensor, t_0, simul_time):
     average_number = 0
-    tot_time = simul_time - t_0
+    tot_time = conf.stopping_time - conf.beggining_time
     for sensor_name in emission_time_per_sensor:
-        average_number += (emission_time_per_sensor[sensor_name][len(emission_time_per_sensor[sensor_name]) - 1] - emission_time_per_sensor[sensor_name][0])/tot_time
+        if len(emission_time_per_sensor[sensor_name])!=0:
+            average_number += (emission_time_per_sensor[sensor_name][len(emission_time_per_sensor[sensor_name]) - 1] - emission_time_per_sensor[sensor_name][0])/tot_time
     return average_number
 
 

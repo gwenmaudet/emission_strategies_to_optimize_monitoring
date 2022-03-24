@@ -6,7 +6,7 @@ import statistics
 
 logging.getLogger().setLevel(logging.INFO)
 
-import binary_tree_v2_without_any_conditions
+import f_M_tau
 import conf
 from simulation import simulation_of_transmissions, diversity_and_nb_of_active_sensors
 
@@ -29,8 +29,8 @@ def initialisation_of_json_file(json_name):
 def do_simulation_binary_to_get_metrics(tau_list):
     for tau in tau_list:
         strtau = str(round(tau, 3))
-        with open(conf.json_dir_binary_nb_of_sensors, 'r') as file:
-            json_file = json.load(file)
+        with open(conf.json_dir_f_M_tau_nb_of_sensors, 'r') as file:
+            json_file = json.load(file)  # The so called 'json_file' as the structure explained just above
         if strtau not in json_file.keys():
             t_i = []
             t_s = []
@@ -52,7 +52,7 @@ def do_simulation_binary_to_get_metrics(tau_list):
                                                                                         battery_type=1,
                                                                                         shut_down=t_s)
             simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes = simulation_of_transmissions.monitoring_of_sensor_emissions(
-                binary_tree_v2_without_any_conditions.binary_tree, tau, event, sensor_names, known_battery=False, beggining_time=conf.beggining_time,
+                f_M_tau.cycling_over_M, tau, event, sensor_names, known_battery=False, beggining_time=conf.beggining_time,
                 stopping_time=conf.stopping_time)
             average_number = diversity_and_nb_of_active_sensors.average_number_of_active_sensors(
                 emission_time_per_sensor, t_0, simul_time)
@@ -60,44 +60,44 @@ def do_simulation_binary_to_get_metrics(tau_list):
                 emission_time_per_sensor, simul_time)
 
             # store average number of sensor
-            with open(conf.json_dir_binary_nb_of_sensors, 'r') as file:
+            with open(conf.json_dir_f_M_tau_nb_of_sensors, 'r') as file:
                 json_file = json.load(file)  # The so called 'json_file' as the structure explained just above
             json_file[strtau] = average_number
-            with open(conf.json_dir_binary_nb_of_sensors, 'w+') as file:
+            with open(conf.json_dir_f_M_tau_nb_of_sensors, 'w+') as file:
                 json.dump(json_file, file)
 
             # store average diversity and std
-            with open(conf.json_dir_binary_diversity_and_std, 'r') as file:
+            with open(conf.json_dir_f_M_tau_diversity_and_std, 'r') as file:
                 json_file = json.load(file)  # The so called 'json_file' as the structure explained just above
             json_file[strtau] = {"average": statistics.mean(diversities), "std": statistics.stdev(diversities)}
-            with open(conf.json_dir_binary_diversity_and_std, 'w+') as file:
+            with open(conf.json_dir_f_M_tau_diversity_and_std, 'w+') as file:
                 json.dump(json_file, file)
 
             # total number of emissions
-            with open(conf.json_dir_binary_nb_of_emissions, 'r') as file:
+            with open(conf.json_dir_f_M_tau_nb_of_emissions, 'r') as file:
                 json_file = json.load(file)  # The so called 'json_file' as the structure explained just above
             json_file[strtau]= len(dt)
-            with open(conf.json_dir_binary_nb_of_emissions, 'w+') as file:
+            with open(conf.json_dir_f_M_tau_nb_of_emissions, 'w+') as file:
                 json.dump(json_file, file)
 
             # nb_of_perturbations
-            with open(conf.json_dir_binary_nb_of_perturbations, 'r') as file:
+            with open(conf.json_dir_f_M_tau_nb_of_perturbations, 'r') as file:
                 json_file = json.load(file)  # The so called 'json_file' as the structure explained just above
             nb_of_perturbation = 0
             for sensor_name in changed_period:
                 nb_of_perturbation += len(changed_period[sensor_name])
             json_file[strtau] = nb_of_perturbation
-            with open(conf.json_dir_binary_nb_of_perturbations, 'w+') as file:
+            with open(conf.json_dir_f_M_tau_nb_of_perturbations, 'w+') as file:
                 json.dump(json_file, file)
 
 
 if __name__ == '__main__':
     # tau_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0 ]
     tau_list = [0.05 + 0.02 * i for i in range(48)]
-    """
-    initialisation_of_json_file(conf.json_dir_binary_nb_of_sensors)
-    initialisation_of_json_file(conf.json_dir_binary_diversity_and_std)
-    initialisation_of_json_file(conf.json_dir_binary_nb_of_emissions)
-    initialisation_of_json_file(conf.json_dir_binary_nb_of_perturbations)
+    """"
+    initialisation_of_json_file(conf.json_dir_f_M_tau_nb_of_sensors)
+    initialisation_of_json_file(conf.json_dir_f_M_tau_diversity_and_std)
+    initialisation_of_json_file(conf.json_dir_f_M_tau_nb_of_emissions)
+    initialisation_of_json_file(conf.json_dir_f_M_tau_nb_of_perturbations)
     """
     do_simulation_binary_to_get_metrics(tau_list)

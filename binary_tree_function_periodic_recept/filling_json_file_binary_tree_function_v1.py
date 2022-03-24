@@ -8,7 +8,7 @@ logging.getLogger().setLevel(logging.INFO)
 import binary_tree_v1
 import conf
 from simulation import simulation_of_transmissions, diversity_and_nb_of_active_sensors
-from f_M_Tau_function_and_plots import f_M_tau
+from f_M_Tau import f_M_tau
 """
 This file allows to fill a json file for the performance of a function for given parameters. 
 We vary the parameters M and tau.

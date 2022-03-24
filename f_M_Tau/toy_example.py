@@ -7,7 +7,7 @@ import math
 logging.getLogger().setLevel(logging.INFO)
 
 from simulation import simulation_of_transmissions,diversity_and_nb_of_active_sensors
-from f_M_Tau_function_and_plots import f_M_tau
+from f_M_Tau import f_M_tau
 import conf
 
 """

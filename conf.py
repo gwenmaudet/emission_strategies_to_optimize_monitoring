@@ -4,7 +4,7 @@ This file gathers the different parameters set for the simulations
 """
 
 n = 100
-C = 100
+
 c_e = 1
 c_r = 1
 
@@ -16,13 +16,18 @@ lambda_shut_down = 0.005
 lambda_battery = 0.01
 lambda_activation = 0.1
 lambda_shut_down = 0.001
-
+C = 1/lambda_battery
 #tau = 1 # reception every 5 minutes
 
-sample_step = 0.1
-threshold_delta_t = 100
+beggining_time = 10000
+stopping_time = 100000
+
 
 T = 20 #spread factor of the utility function
+sample_step = T/50
+threshold_delta_t = T*10
+
+
 #T = 20 #modified spred factor fo utility function
 
 sample_step_for_diversity = T/100
@@ -35,9 +40,14 @@ json_dir_binary_nb_of_emissions = 'C:\\Users\\Gwen Maudet\\PycharmProjects\\emis
 json_dir_binary_nb_of_perturbations = 'C:\\Users\\Gwen Maudet\\PycharmProjects\\emission_strategies_to_optimize_monitoring\\binary_tree_function_no_hypothesis\\json_files\\DB_binary_nb_of_perturbations.json'
 json_dir_binary_diversity_and_std = 'C:\\Users\\Gwen Maudet\\PycharmProjects\\emission_strategies_to_optimize_monitoring\\binary_tree_function_no_hypothesis\\json_files\\DB_binary_diversity_and_std.json'
 
+json_dir_f_M_tau_nb_of_sensors = 'C:\\Users\\Gwen Maudet\\PycharmProjects\\emission_strategies_to_optimize_monitoring\\f_M_Tau\\json_files\\DB_f_M_tau_nb_of_sensors.json'
+json_dir_f_M_tau_nb_of_emissions = 'C:\\Users\\Gwen Maudet\\PycharmProjects\\emission_strategies_to_optimize_monitoring\\f_M_Tau\\json_files\\DB_f_M_tau_nb_of_emissions.json'
+json_dir_f_M_tau_nb_of_perturbations = 'C:\\Users\\Gwen Maudet\\PycharmProjects\\emission_strategies_to_optimize_monitoring\\f_M_Tau\\json_files\\DB_f_M_tau_nb_of_perturbations.json'
+json_dir_f_M_tau_diversity_and_std = 'C:\\Users\\Gwen Maudet\\PycharmProjects\\emission_strategies_to_optimize_monitoring\\f_M_Tau\\json_files\\DB_f_M_tau_diversity_and_std.json'
 
 
-json_dir_for_db_f_M_tau = 'C:\\Users\\Gwen Maudet\\PycharmProjects\\emission_strategies_to_optimize_monitoring\\f_M_Tau_function_and_plots\\json_files\\data_base_for_choice_of_f.json'
+
+json_dir_for_db_f_M_tau = '/f_M_Tau\\json_files\\data_base_for_choice_of_f.json'
 
 
 json_dir_f_M_tau_for_comparison = 'C:\\Users\\Gwen Maudet\\PycharmProjects\\emission_strategies_to_optimize_monitoring\\binary_tree_function_periodic_recept\\json_files\\DB_f_M_tau_for_comparison.json'

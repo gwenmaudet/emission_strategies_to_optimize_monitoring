@@ -43,7 +43,7 @@ t_0 : initial emission
 """
 
 
-def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_names, M=None, known_battery=True, stopping_time = 100000000000000000000000000000000000000000):
+def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_names, M=None, known_battery=True,beggining_time=0, stopping_time = 100000000000000000000000000000000000000000):
     nb_of_changes = 0
     simul_time = 0
     dt = []
@@ -63,8 +63,10 @@ def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_name
         else:
             if evt.is_empty_value is False:
                 delta_t = evt.wake_up - simul_time
-                dt.append(delta_t)
+
                 simul_time = evt.wake_up
+                if simul_time >beggining_time:
+                    dt.append(delta_t)
             """if round(delta_t, 3) > round(tau, 3):
                 logging.info("the result from the function with parameters M="
                              + str(M) + " and tau=" + str(tau) + " because the monitoring ends before all the sensors get included")
@@ -75,12 +77,14 @@ def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_name
         view = sensor_view(evt, battery=known_battery)
         new_period = management_function(view, evt.wake_up, tau, M, known_battery=known_battery)  ######## use of the management function. return the value if it has changed, None otherwise
         if evt.is_empty_value is False:
-            emission_time_per_sensor[evt.name].append(evt.wake_up)
             if new_period is not None and new_period != evt.period:
                 evt.set_period(new_period)
-                changed_period[evt.name].append(evt.wake_up)
                 nb_of_changes += 1
+                if simul_time > beggining_time:
+                    changed_period[evt.name].append(evt.wake_up)
             evt.expected_next_emission = evt.wake_up + evt.period
+            if simul_time > beggining_time:
+                emission_time_per_sensor[evt.name].append(evt.wake_up)
         event = evt.sleep(evt.wake_up, event)
 
     return simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes
