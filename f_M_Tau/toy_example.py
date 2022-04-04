@@ -96,19 +96,19 @@ if __name__ == '__main__':
     simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes = simulation_of_transmissions.monitoring_of_sensor_emissions(
         f_M_tau.cycling_over_M, tau, event, names, M=M)
 
-    #plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)
-
+    plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)
+    """
     t_i = []
     t_s = []
     t = 0
     for i in range(n):
         p = random.uniform(0, 1)
-        t -= math.log(p) / conf.lambda_activation
+        t -= math.log(p) / conf.lambda_
         t_i.append(t)
         p = random.uniform(0, 1)
-        new_time = t - math.log(p) / conf.lambda_shut_down
+        new_time = t - math.log(p) / conf.mu
         t_s.append(new_time)
     names, event = simulation_of_transmissions.initialisation_of_sensors(t_i, battery=C, battery_type=2, shut_down=t_s)
     simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes = simulation_of_transmissions.monitoring_of_sensor_emissions(
         f_M_tau.cycling_over_M, tau, event, names, M=None, known_battery=False)
-    plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)
+    plot_inter_arrival(dt, simul_time, emission_time_per_sensor, changed_period, t_0, tau)"""

@@ -48,14 +48,14 @@ def comparison_f_m_tua_binary(json_to_fill_binary, json_file_f_M_tau, tau_list, 
             t_s = []
             t = 0
             p = random.uniform(0, 1)
-            t -= math.log(p) / conf.lambda_activation
+            t -= math.log(p) / conf.lambda_
             while t < stopping_time:
                 t_i.append(t)
                 p = random.uniform(0, 1)
-                new_time = t - math.log(p) / conf.lambda_shut_down
+                new_time = t - math.log(p) / conf.mu
                 t_s.append(new_time)
                 p = random.uniform(0, 1)
-                t -= math.log(p) / conf.lambda_activation
+                t -= math.log(p) / conf.lambda_
             # binary
             logging.info(
                     "filling the data base '" + json_to_fill_binary + "' with parameters  tau=" + str(
@@ -104,14 +104,14 @@ def do_simulation_multiple_times_and_get_metrics( tau_list, nb_of_iterations, st
             t_s = []
             t = 0
             p = random.uniform(0, 1)
-            t -= math.log(p) / conf.lambda_activation
+            t -= math.log(p) / conf.lambda_
             while t < stopping_time:
                 t_i.append(t)
                 p = random.uniform(0, 1)
-                new_time = t - math.log(p) / conf.lambda_shut_down
+                new_time = t - math.log(p) / conf.mu
                 t_s.append(new_time)
                 p = random.uniform(0, 1)
-                t -= math.log(p) / conf.lambda_activation
+                t -= math.log(p) / conf.lambda_
             # binary
             logging.info(
                     "filling the data base with parameters  tau=" + str(

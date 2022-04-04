@@ -81,7 +81,7 @@ def write_latex_sensor_variation_proba():
         pdt = 1
         pdts = []
         for i in range(1, nb_max_of_iteration):
-            pdt = pdt * (conf.lambda_activation/(i*conf.lambda_shut_down + conf.lambda_battery/float(tau)))
+            pdt = pdt * (conf.lambda_ / (i * conf.mu + conf.gamma / float(tau)))
             pdts.append(pdt)
             pi += pdt
         pi = 1/(1 + pi)

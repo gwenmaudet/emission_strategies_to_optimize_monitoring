@@ -49,6 +49,7 @@ def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_name
     dt = []
     emission_time_per_sensor = {}
     changed_period = {}
+    nb_of_change_ids = 0
     t_0 = 0
     for name in sensor_names:
         emission_time_per_sensor[name] = []
@@ -75,7 +76,8 @@ def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_name
 
 
         view = sensor_view(evt, battery=known_battery)
-        new_period = management_function(view, evt.wake_up, tau, M, known_battery=known_battery)  ######## use of the management function. return the value if it has changed, None otherwise
+        new_period, change_id = management_function(view, evt.wake_up, tau, M, known_battery=known_battery)  ######## use of the management function. return the value if it has changed, None otherwise
+        nb_of_change_ids += change_id
         if evt.is_empty_value is False:
             if new_period is not None and new_period != evt.period:
                 evt.set_period(new_period)
@@ -87,7 +89,7 @@ def monitoring_of_sensor_emissions(management_function, tau,  event, sensor_name
                 emission_time_per_sensor[evt.name].append(evt.wake_up)
         event = evt.sleep(evt.wake_up, event)
 
-    return simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes
+    return simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes, nb_of_change_ids
 
 
 if __name__ == '__main__':

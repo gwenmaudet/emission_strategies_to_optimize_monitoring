@@ -42,7 +42,7 @@ class sensor:
             self.is_empty_value = True
         if self.battery_type == 2:
             p = random.uniform(0, 1)
-            if p< (1 - math.exp(-conf.lambda_battery)):
+            if p< (1 - math.exp(-conf.gamma)):
                 self.is_empty_value = True
         # self.wake_up = simul_time + random.uniform(0, self.period)
         self.wake_up = simul_time + self.period

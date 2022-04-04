@@ -8,7 +8,7 @@ def remove_evt_from_active_sensors(elt_in_memory_that_will_die, type, simul_time
                                    , parent):
     if len(children
            ) == 0 and len(parent) == 0:
-        return [], []
+        return [], [], 0
     """print("REMOOVING")
     print(children
     )
@@ -23,6 +23,7 @@ def remove_evt_from_active_sensors(elt_in_memory_that_will_die, type, simul_time
         children, found_elt = get_elt_in_list_by_id_tree(id_to_find, children)
         found_elt["id_tree"] = found_elt["id_tree"][:(len(elt_in_memory_that_will_die["id_tree"]) - 1)]
         parent.append(found_elt)
+        nb_of_changes = 1
     else:
 
         children, elt = next_emmiting_sensor_according_to_type(children
@@ -42,7 +43,8 @@ def remove_evt_from_active_sensors(elt_in_memory_that_will_die, type, simul_time
                                             :(len(complementary_children["id_tree"]) - 1)]
         parent.append(complementary_children)
         parent.append(children_elt)
-    return children, parent
+        nb_of_changes = 2
+    return children, parent, nb_of_changes
 
 
 def next_emmiting_sensor_according_to_type(children_or_parent):
@@ -100,6 +102,7 @@ def binary_tree(evt, simul_time, tau, M=0, known_battery = False):
     global sensor_view_list
 
     new_period = None
+    change_id = 0
     if evt is None:
         children \
             = []
@@ -121,6 +124,7 @@ def binary_tree(evt, simul_time, tau, M=0, known_battery = False):
                 # print("he ho")
                 # print(parent)
                 new_period, children, parent = add_new_sensor(evt, simul_time, tau, children, parent)
+                change_id += 2
             else:
                 children, parent, elt_in_memory, type = find_elt_by_name(evt, children, parent)
                 if abs(round(tau * math.pow(2, len(elt_in_memory["id_tree"])) - evt.period, 3)) == 0:
@@ -134,12 +138,13 @@ def binary_tree(evt, simul_time, tau, M=0, known_battery = False):
                         children = parent
                         parent = []
                         type = "children"
-                    children, parent = remove_evt_from_active_sensors(elt_in_memory, type, simul_time, tau, children,
+                    children, parent,nb_of_changes = remove_evt_from_active_sensors(elt_in_memory, type, simul_time, tau, children,
                                                                       parent)
+                    change_id += nb_of_changes
                     sensor_view_list.remove(evt)
                 else:
                     if type == "parent":
                         parent.append(elt_in_memory)
                     else:
                         children.append(elt_in_memory)
-        return new_period
+        return new_period, change_id

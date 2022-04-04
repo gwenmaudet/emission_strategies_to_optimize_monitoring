@@ -108,4 +108,4 @@ def cycling_over_M(evt, simul_time, tau, M, known_battery=True):
             # if sensor_death is None : pas de changement de periode et deja la période finale : M * \tau
             if sensor_death is not None:
                 update_end_of_devices([evt.name, sensor_death])
-    return new_period
+    return new_period, 0

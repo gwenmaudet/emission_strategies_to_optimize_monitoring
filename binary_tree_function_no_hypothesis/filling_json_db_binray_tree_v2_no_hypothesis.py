@@ -36,22 +36,22 @@ def do_simulation_binary_to_get_metrics(tau_list):
             t_s = []
             t = 0
             p = random.uniform(0, 1)
-            t -= math.log(p) / conf.lambda_activation
+            t -= math.log(p) / conf.lambda_
             while t < conf.stopping_time:
                 t_i.append(t)
                 p = random.uniform(0, 1)
-                new_time = t - math.log(p) / conf.lambda_shut_down
+                new_time = t - math.log(p) / conf.mu
                 t_s.append(new_time)
                 p = random.uniform(0, 1)
-                t -= math.log(p) / conf.lambda_activation
+                t -= math.log(p) / conf.lambda_
             # binary
             logging.info(
                 "filling the data base with parameters  tau=" + str(
                     round(tau, 3)))
             sensor_names, event = simulation_of_transmissions.initialisation_of_sensors(t_i, battery=conf.C,
-                                                                                        battery_type=1,
+                                                                                        battery_type=2,
                                                                                         shut_down=t_s)
-            simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes = simulation_of_transmissions.monitoring_of_sensor_emissions(
+            simul_time, dt, emission_time_per_sensor, changed_period, t_0, nb_of_changes, nb_of_change_ids = simulation_of_transmissions.monitoring_of_sensor_emissions(
                 binary_tree_v2_without_any_conditions.binary_tree, tau, event, sensor_names, known_battery=False, beggining_time=conf.beggining_time,
                 stopping_time=conf.stopping_time)
             average_number = diversity_and_nb_of_active_sensors.average_number_of_active_sensors(
@@ -90,14 +90,23 @@ def do_simulation_binary_to_get_metrics(tau_list):
             with open(conf.json_dir_binary_nb_of_perturbations, 'w+') as file:
                 json.dump(json_file, file)
 
+            #nb of id changes
+            with open(conf.json_dir_binary_nb_of_change_ids, 'r') as file:
+                json_file = json.load(file)  # The so called 'json_file' as the structure explained just above
+            json_file[strtau] = nb_of_change_ids
+            with open(conf.json_dir_binary_nb_of_change_ids, 'w+') as file:
+                json.dump(json_file, file)
+
 
 if __name__ == '__main__':
     # tau_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0 ]
-    tau_list = [0.05 + 0.02 * i for i in range(48)]
-    """
-    initialisation_of_json_file(conf.json_dir_binary_nb_of_sensors)
+    #tau_list = [0.05 + 0.02 * i for i in range(48)]
+    tau_list = [1.01 + 0.02 * i for i in range(24)]
+
+    """initialisation_of_json_file(conf.json_dir_binary_nb_of_sensors)
     initialisation_of_json_file(conf.json_dir_binary_diversity_and_std)
     initialisation_of_json_file(conf.json_dir_binary_nb_of_emissions)
     initialisation_of_json_file(conf.json_dir_binary_nb_of_perturbations)
+    initialisation_of_json_file(conf.json_dir_binary_nb_of_change_ids)
     """
     do_simulation_binary_to_get_metrics(tau_list)

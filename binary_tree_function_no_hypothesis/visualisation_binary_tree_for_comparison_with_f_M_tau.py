@@ -17,7 +17,7 @@ def write_latex_nb_of_sensors():
     taus = sorted(taus)
     #exponential results
     with open('latex_files_for_comparison_with_other_function/binary_nb_of_sensors.tex', 'a') as fout:
-        fout.write("\\addplot+[smooth,mark=*, only marks] plot coordinates {")
+        fout.write("\\addplot+[smooth,mark=*, only marks,mark options={draw=blue,fill=blue,}] plot coordinates {")
     for tau in taus:
         strtau = str(tau)
         mean = json_file[strtau]
@@ -35,7 +35,7 @@ def write_latex_nb_of_emissions():
     taus = [float(elt) for elt in json_file.keys()]
     taus = sorted(taus)
     with open('latex_files_for_comparison_with_other_function/binary_nb_of_emissions.tex', 'a') as fout:
-        fout.write("\\addplot+[smooth,mark=*, only marks] plot coordinates {")
+        fout.write("\\addplot+[smooth,mark=*, only marks,mark options={draw=blue,fill=blue,}] plot coordinates {")
     for tau in taus:
         strtau = str(tau)
         mean = json_file[strtau]
@@ -51,13 +51,14 @@ def write_latex_nb_of_perturbations():
         json_file = json.load(file)
     taus = [float(elt) for elt in json_file.keys()]
     taus = sorted(taus)
+    total_time = conf.stopping_time - conf.beggining_time
     with open('latex_files_for_comparison_with_other_function/binary_nb_of_perturbations.tex', 'a') as fout:
-        fout.write("\\addplot+[smooth,mark=*, only marks] plot coordinates{")
+        fout.write("\\addplot+[smooth,mark=*, only marks,mark options={draw=blue,fill=blue,}] plot coordinates{")
     for tau in taus:
         strtau = str(tau)
         mean = json_file[strtau]
         with open('latex_files_for_comparison_with_other_function/binary_nb_of_perturbations.tex', 'a') as fout:
-            fout.write("(" + str(tau) + ',' + str(mean) + ')')
+            fout.write("(" + str(tau) + ',' + str(mean/total_time) + ')')
     with open('latex_files_for_comparison_with_other_function/binary_nb_of_perturbations.tex', 'a') as fout:
         fout.write("};")
 
@@ -70,7 +71,7 @@ def write_latex_diversity_and_std():
     taus = [float(elt) for elt in json_file.keys()]
     taus = sorted(taus)
     with open('latex_files_for_comparison_with_other_function/binary_diversity_and_std.tex', 'a') as fout:
-        fout.write("\\addplot+[smooth,mark=*, only marks,error bars/.cd, y dir=both, y explicit,] plot coordinates {")
+        fout.write("\\addplot+[blue,smooth,mark=*, only marks,error bars/.cd, y dir=both, y explicit] plot coordinates {")
     for tau in taus:
         strtau = str(tau)
         mean = json_file[strtau]["average"]
